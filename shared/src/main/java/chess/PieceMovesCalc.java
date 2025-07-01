@@ -3,29 +3,32 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 public class PieceMovesCalc {
-    public Collection<ChessMove> calculateMoves(ChessBoard board, ChessPosition position, ChessPiece piece) {
-        switch (piece.getPieceType()) {
-            case KING:
-                return calcKingMoves(board, position, piece);
-            case QUEEN:
-                return calcQueenMoves(board, position, piece);
-            case BISHOP:
-                return calcBishopMoves(board, position, piece);
-            case ROOK:
-                return calcRookMoves(board, position, piece);
-            case PAWN:
-                return calcPawnMoves(board, position, piece);
-            case KNIGHT:
-                return calcKnightMoves(board, position, piece);
-            default:
-                return new ArrayList<>();
+    public Collection<ChessMove> calculateMoves(ChessBoard board,
+                                                ChessPosition
+            position, ChessPiece piece) {
+        if (Objects.requireNonNull(piece.getPieceType()) == ChessPiece.PieceType.KING) {
+            return calcKingMoves(board, position, piece);
+        } else if (piece.getPieceType() == ChessPiece.PieceType.QUEEN) {
+            return calcQueenMoves(board, position, piece);
+        } else if (piece.getPieceType() == ChessPiece.PieceType.BISHOP) {
+            return calcBishopMoves(board, position, piece);
+        } else if (piece.getPieceType() == ChessPiece.PieceType.ROOK) {
+            return calcRookMoves(board, position, piece);
+        } else if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
+            return calcPawnMoves(board, position, piece);
+        } else if (piece.getPieceType() == ChessPiece.PieceType.KNIGHT) {
+            return calcKnightMoves(board, position, piece);
         }
+        return new ArrayList<>();
     }
 
     //KING
-    private Collection<ChessMove> calcKingMoves(ChessBoard board, ChessPosition position, ChessPiece piece) {
+    private Collection<ChessMove> calcKingMoves(ChessBoard board,
+                                                ChessPosition position,
+                                                ChessPiece piece) {
         //king can go one space any direction, including diagonals
         List<ChessMove> moves = new ArrayList<>();
         int[][] direction = {
@@ -56,7 +59,9 @@ public class PieceMovesCalc {
 
 
     //QUEEN
-    private Collection<ChessMove> calcQueenMoves(ChessBoard board, ChessPosition position, ChessPiece piece) {
+    private Collection<ChessMove> calcQueenMoves(ChessBoard board,
+                                                 ChessPosition position,
+                                                 ChessPiece piece) {
         List<ChessMove> moves = new ArrayList<>();
         int[][] direction = {
                 {0, 1}, {1, 0}, {0, -1}, {-1, 0},//left, right, up down
@@ -88,7 +93,9 @@ public class PieceMovesCalc {
 
 
     //BISHOP
-    private Collection<ChessMove> calcBishopMoves(ChessBoard board, ChessPosition position, ChessPiece piece) {
+    private Collection<ChessMove> calcBishopMoves(ChessBoard board,
+                                                  ChessPosition position,
+                                                  ChessPiece piece) {
         List<ChessMove> moves = new ArrayList<>();
         int[][] direction = {
                 {1, 1}, {1, -1}, {-1, 1}, {-1, -1} //up right, up left, down right, down left
@@ -99,7 +106,8 @@ public class PieceMovesCalc {
             while (true) {
                 newRow += dir[0];
                 newCol += dir[1];
-                if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) { // make sure it's in the bounds of the chess board
+                if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) {
+                    // make sure it's in the bounds of the chess board
                     //cant be less than one or greater than 8
                     break;
                 }
@@ -120,7 +128,9 @@ public class PieceMovesCalc {
     }
 
     //PAWN
-    private Collection<ChessMove> calcPawnMoves(ChessBoard board, ChessPosition position, ChessPiece piece) {
+    private Collection<ChessMove> calcPawnMoves(ChessBoard board,
+                                                ChessPosition position,
+                                                ChessPiece piece) {
         List<ChessMove> moves = new ArrayList<>();
         int dir = 1;
         int strt = 2;
@@ -197,7 +207,8 @@ public class PieceMovesCalc {
         }
     }
 
-    private void applypromo(List<ChessMove> moves, ChessPosition start, ChessPosition end ) {
+    private void applypromo(List<ChessMove> moves, ChessPosition start,
+                            ChessPosition end ) {
         moves.add(new ChessMove(start, end, ChessPiece.PieceType.QUEEN));
         moves.add(new ChessMove(start, end, ChessPiece.PieceType.ROOK));
         moves.add(new ChessMove(start, end, ChessPiece.PieceType.KNIGHT));
@@ -209,7 +220,9 @@ public class PieceMovesCalc {
 
 
     //ROOK
-    private Collection<ChessMove> calcRookMoves(ChessBoard board, ChessPosition position, ChessPiece piece) {
+    private Collection<ChessMove> calcRookMoves(ChessBoard board,
+                                                ChessPosition position,
+                                                ChessPiece piece) {
         List<ChessMove> moves = new ArrayList<>();
         int[][] direction = {
                 {1, 0}, {0, 1}, {-1, 0}, {0, -1}}; //up down left right
@@ -219,7 +232,8 @@ public class PieceMovesCalc {
             while (true) {
                 newRow += dir[0];
                 newCol += dir[1];
-                if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) { // make sure it's in the bounds of the chess board
+                if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) {
+                    // make sure it's in the bounds of the chess board
                     //cant be less than one or greater than 8
                     break;
                 }
@@ -240,15 +254,18 @@ public class PieceMovesCalc {
 
 
     //KNIGHT
-private Collection<ChessMove> calcKnightMoves(ChessBoard board, ChessPosition position, ChessPiece piece) {
+private Collection<ChessMove> calcKnightMoves(ChessBoard board,
+                                              ChessPosition position,
+                                              ChessPiece piece) {
     List<ChessMove> moves = new ArrayList<>();
     int[][] direction = {{1, 2}, {2, 1}, {-1, 2}, {1, -2},
             {2, -1}, {-2, 1}, {-2,-1}, {-1,-2}};
     for (int[] dir : direction) {
         int newRow = position.getRow() + dir[0];
         int newCol = position.getColumn() + dir[1];
-        if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) { // make sure it's in the bounds of the chess board
-            //cant be less than one or greater than 8
+        if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) {
+            // make sure it's in the bounds of the chess board
+            //can't be less than one or greater than 8
             continue;
         }
         ChessPosition newPos = new ChessPosition(newRow, newCol);
