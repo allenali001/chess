@@ -15,10 +15,10 @@ public class PieceMovesCalc {
                 return calcBishopMoves(board, position, piece);
             case ROOK:
                 return calcRookMoves(board, position, piece);
-            // case PAWN:
-            //  return calcPawnMoves(board, position, piece);
-            //case KNIGHT:
-            //   return calcKnightMoves(board, position, piece);
+             case PAWN:
+              return calcPawnMoves(board, position, piece);
+            case KNIGHT:
+               return calcKnightMoves(board, position, piece);
             default:
                 return new ArrayList<>();
         }
@@ -119,18 +119,22 @@ public class PieceMovesCalc {
         return moves;
     }
 
-       /*private Collection<ChessMove> calcPawnMoves(ChessBoard board, ChessPosition position, ChessPiece piece) {
-            List<ChessMove> moves = new ArrayList<>();
-            int[][] direction = { {0,1},{1,1},{-1,1}};
-            for (int[] dir : direction) {
-                int newRow = position.getRow();
-                int newCol= position.getColumn();
-                int currrow= position.getRow();
-                int startRow = 2;
-                if (currrow == startRow){
+     /*  private Collection<ChessMove> calcPawnMoves(ChessBoard board, ChessPosition position, ChessPiece piece) {
+           List<ChessMove> moves = new ArrayList<>();
+           int[][] direction = {{0, 1}, {1, 1}, {-1, 1}};
+           for (int[] dir : direction) {
+               int newRow = position.getRow();
+               int newCol = position.getColumn();
+               int currrow = position.getRow();
+               int startRow = 2;
+               if (currrow == startRow){
 
-                }
-        }*/
+               }
+           }
+           return moves;
+       }*/
+
+
 
     //ROOK
     private Collection<ChessMove> calcRookMoves(ChessBoard board, ChessPosition position, ChessPiece piece) {
@@ -159,11 +163,35 @@ public class PieceMovesCalc {
                 }
             }
         }
+        return moves;
+    }
 
+
+    //KNIGHT
+private Collection<ChessMove> calcKnightMoves(ChessBoard board, ChessPosition position, ChessPiece piece) {
+    List<ChessMove> moves = new ArrayList<>();
+    int[][] direction = {{1, 2}, {2, 1}, {-1, 2}, {1, -2},
+            {2, -1}, {-2, 1}, {-2,-1}, {-1,-2}};
+    for (int[] dir : direction) {
+        int newRow = position.getRow() + dir[0];
+        int newCol = position.getColumn() + dir[1];
+        if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) { // make sure it's in the bounds of the chess board
+            //cant be less than one or greater than 8
+            continue;
+        }
+        ChessPosition newPos = new ChessPosition(newRow, newCol);
+        ChessPiece opponent = board.getPiece(newPos);
+        if (opponent == null) {
+            moves.add(new ChessMove(position, newPos, null));
+        }else {
+            if (opponent.getTeamColor() != piece.getTeamColor()) {
+                moves.add(new ChessMove(position, newPos, null));
+            }
+        }
+        }
         return moves;
     }
 }
-
 
 
 
