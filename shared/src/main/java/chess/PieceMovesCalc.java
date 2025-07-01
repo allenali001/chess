@@ -170,7 +170,7 @@ public class PieceMovesCalc {
                 if (leftrow>=1 &&leftrow<=8 &&leftcol>=1 && leftcol<=8) {
                     ChessPosition leftcap = new ChessPosition(leftrow, leftcol);
                     ChessPiece opponent = board.getPiece(leftcap);
-                    if (opponent != null && opponent.getTeamColor() != piece.getTeamColor()) {
+                    if (opponent != null && (opponent.getTeamColor() != piece.getTeamColor())) {
                         if (promorow(leftrow, piece.getTeamColor())) {
                             applypromo(moves, position, leftcap);
                         } else {
@@ -199,11 +199,7 @@ public class PieceMovesCalc {
         if (color == ChessGame.TeamColor.WHITE && row == 8) {
             return true;
         } else {
-            if (color == ChessGame.TeamColor.BLACK && row == 1) {
-                return true;
-            }else{
-                return false;
-            }
+            return color == ChessGame.TeamColor.BLACK && row == 1;
         }
     }
 
