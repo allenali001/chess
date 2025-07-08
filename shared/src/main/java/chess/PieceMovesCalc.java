@@ -9,20 +9,22 @@ public class PieceMovesCalc {
     public Collection<ChessMove> calculateMoves(ChessBoard board,
                                                 ChessPosition
             position, ChessPiece piece) {
-        if (Objects.requireNonNull(piece.getPieceType()) == ChessPiece.PieceType.KING) {
-            return calcKingMoves(board, position, piece);
-        } else if (piece.getPieceType() == ChessPiece.PieceType.QUEEN) {
-            return calcQueenMoves(board, position, piece);
-        } else if (piece.getPieceType() == ChessPiece.PieceType.BISHOP) {
-            return calcBishopMoves(board, position, piece);
-        } else if (piece.getPieceType() == ChessPiece.PieceType.ROOK) {
-            return calcRookMoves(board, position, piece);
-        } else if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
-            return calcPawnMoves(board, position, piece);
-        } else if (piece.getPieceType() == ChessPiece.PieceType.KNIGHT) {
-            return calcKnightMoves(board, position, piece);
+        switch (piece.getPieceType()) {
+            case KING:
+                return calcKingMoves(board, position, piece);
+            case QUEEN:
+                return calcQueenMoves(board, position, piece);
+            case PAWN:
+                return calcPawnMoves(board, position, piece);
+            case ROOK:
+                return calcRookMoves(board, position, piece);
+            case BISHOP:
+                return calcBishopMoves(board, position, piece);
+            case KNIGHT:
+                return calcKnightMoves(board, position, piece);
+            default:
+                return new ArrayList<>();
         }
-        return new ArrayList<>();
     }
 
     //KING
@@ -140,7 +142,6 @@ public class PieceMovesCalc {
         }
         int row = position.getRow();
         int col = position.getColumn();
-
         //moveone
         int oneclear=row+dir;
         if (oneclear >=1 &&oneclear<=8 && col>=1 && col<=8){
@@ -176,6 +177,7 @@ public class PieceMovesCalc {
                         } else {
                             moves.add(new ChessMove(position, leftcap, null));
                         }
+
                     }
                 }
                 //capright
