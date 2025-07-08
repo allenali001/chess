@@ -12,6 +12,7 @@ public class ChessGame {
 
     private TeamColor team;
     private ChessBoard board;
+    private ChessPosition startPosition;
 
     public ChessGame() {
 
@@ -49,6 +50,7 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+        this.startPosition = startPosition;
         throw new RuntimeException("Not implemented");
     }
 
