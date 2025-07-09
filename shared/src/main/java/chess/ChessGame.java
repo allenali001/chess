@@ -1,6 +1,8 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -15,8 +17,10 @@ public class ChessGame {
     private ChessPosition startPosition;
 
     public ChessGame() {
-
+        this.board=new ChessBoard();
+        this.team=TeamColor.WHITE;
     }
+
 
     /**
      * @return Which team's turn it is
@@ -50,10 +54,43 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        this.startPosition = startPosition;
-        throw new RuntimeException("Not implemented");
-    }
+        ChessPiece piece = board.getPiece(startPosition);
+        if (piece==null ||piece.getTeamColor() != team) {
+            return null;
+        }
+        Collection<ChessMove> moveoptions=piece.pieceMoves(board,startPosition);
+        Collection<ChessMove> valmovelist=new ArrayList<>();
+        for (ChessMove mov: moveoptions){
+            ChessBoard copyBoard=new ChessBoard();
+            int col;
+            int row;
+            row=1;
+            while (row<=8) {
+                col=1;
+                while (col<=8) {
+                    ChessPosition newPos = new ChessPosition(row, col);
+                    ChessPiece opponent = board.getPiece(newPos);
+                    copyBoard.addPiece(newPos, opponent);
+                    col++;
+                }
+                row++;
+            }
+            ChessPiece movingPiece = board.getPiece(mov.getStartPosition());
+            copyBoard.addPiece(mov.getStartPosition(),null);
+            copyBoard.addPiece(mov.getEndPosition(),movingPiece);
 
+            //have to make copy of board so can use isInCheckHelp
+            ChessBoard ogBoard = this.board;
+            this.board=copyBoard;
+            boolean isInCheckHelp = isInCheck(team);
+            //switch back to original board
+            this.board=ogBoard;
+            if(!isInCheckHelp){
+                valmovelist.add(mov);
+            }
+        }
+        return valmovelist;
+    }
     /**
      * Makes a move in a chess game
      *
@@ -61,9 +98,29 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = board.getPiece(move.getStartPosition());
+        if (piece == null) {
+            throw new InvalidMoveException("No piece");
+        }
+        if (piece.getTeamColor()!=team){
+            throw new InvalidMoveException("Not this team's turn");
+        }
+        Collection<ChessMove> valmoves = validMoves(move.getStartPosition());
+        if(valmoves==null || !valmoves.contains(move)){
+            throw new InvalidMoveException("Invalid move");
+        }
+        //add piecees to the board
+        board.addPiece(move.getEndPosition(), piece);
+        board.addPiece(move.getStartPosition(),null);
+        //next teams turn
+        if (this.team==TeamColor.BLACK){
+            this.team=TeamColor.WHITE;
+        }else{
+            if(this.team==TeamColor.WHITE){
+                this.team=TeamColor.BLACK;
+            }
+        }
     }
-
     /**
      * Determines if the given team is in check
      *
@@ -71,7 +128,8 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        //for testing purposes
+        return false;
     }
 
     /**
