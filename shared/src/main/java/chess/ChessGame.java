@@ -18,6 +18,7 @@ public class ChessGame {
 
     public ChessGame() {
         this.board=new ChessBoard();
+        this.board.resetBoard();
         this.team=TeamColor.WHITE;
     }
 
@@ -79,7 +80,7 @@ public class ChessGame {
             //have to make copy of board so can use isInCheckHelp
             ChessBoard ogBoard = this.board;
             this.board=copyBoard;
-            boolean isInCheckHelp = isInCheck(team);
+            boolean isInCheckHelp = isInCheck(piece.getTeamColor());
             //switch back to original board
             this.board=ogBoard;
             if(!isInCheckHelp){
@@ -180,7 +181,32 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        int row;
+        int col;
+        row=1;
+        if (isInCheck(teamColor)==false){
+            return false;
+        }
+        while (row <= 8) {
+            col = 1;
+            while (col <= 8) {
+                ChessPosition newPos = new ChessPosition(row,col);
+                ChessPiece piece=board.getPiece(newPos);
+                if(piece!=null) {
+                    if (piece.getTeamColor() == teamColor) {
+                        Collection<ChessMove> moves = validMoves(newPos);
+                        if (moves != null) {
+                            if (!moves.isEmpty()) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+                    col+=1;
+                }
+                row+=1;
+            }
+            return true;
     }
 
     /**
@@ -191,8 +217,35 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        int row;
+        int col;
+        row = 1;
+        if (isInCheck(teamColor)) {
+            return false;
+        }
+        while (row <= 8) {
+            col = 1;
+            while (col <= 8) {
+                ChessPosition newPos = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(newPos);
+                if (piece != null) {
+                    if (piece.getTeamColor() == teamColor) {
+                        Collection<ChessMove> moves = validMoves(newPos);
+                        if (moves != null) {
+                            if (!moves.isEmpty()) {
+                                return false;
+                            }
+
+                        }
+                    }
+                }
+                col+=1;
+            }
+            row+=1;
+        }
+        return true;
     }
+
 
     /**
      * Sets this game's chessboard with a given board
