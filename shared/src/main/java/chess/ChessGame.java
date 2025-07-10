@@ -160,6 +160,7 @@ public class ChessGame {
         int col;
         int row;
         row = 1;
+        //bounds
         while (row <= 8 && king == null) {
             col = 1;
             while (col <= 8 && king == null) {
@@ -177,6 +178,7 @@ public class ChessGame {
         }
         //reset row
         row = 1;
+        //bounds
         while (row <= 8) {
             col = 1;
             while (col <= 8) {
@@ -210,12 +212,14 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
+        //follow same logic as is in check
         int row;
         int col;
         row = 1;
         if (!isInCheck(teamColor)) {
             return false;
         }
+        //bounds
         while (row <= 8) {
             col = 1;
             while (col <= 8) {
@@ -246,6 +250,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
+        //follow same logic as is in check
         int row;
         int col;
         row = 1;
@@ -255,6 +260,7 @@ public class ChessGame {
         while (row <= 8) {
             col = 1;
             while (col <= 8) {
+                //^keep us in bounds
                 ChessPosition newPos = new ChessPosition(row, col);
                 ChessPiece piece = board.getPiece(newPos);
                 if (piece != null) {

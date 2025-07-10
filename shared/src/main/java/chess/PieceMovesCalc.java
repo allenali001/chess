@@ -43,7 +43,7 @@ public class PieceMovesCalc {
             int newRow = position.getRow() + mov[0];
             int newCol = position.getColumn() + mov[1];
             if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) {
-                break;
+                continue;
             }
             ChessPosition newPos = new ChessPosition(newRow, newCol);
             ChessPiece opponent = board.getPiece(newPos);
