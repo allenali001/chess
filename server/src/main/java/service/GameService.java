@@ -58,8 +58,8 @@ public class GameService {
         AuthService authService;
         authService = new AuthService();
         authService.valAuthToken(listGamerRequest.authToken());
-        List<GameData> g;
-        g = gameDAO.listGames();
-        return new ListGameResult(g,null,null);
+        List<GameData> games;
+        games = gameDAO.listGames();
+        return new ListGameResult(games,null);
     }
 }
