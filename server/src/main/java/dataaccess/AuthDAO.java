@@ -1,6 +1,7 @@
 package dataaccess;
 import models.AuthData;
 import models.UserData;
+import service.exceptions.IncorrectAuthTokenException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,17 +28,14 @@ public class AuthDAO {
         authdatlist.clear();
     }
 
-    public void deleteAuth(String authtok){
-        int max = authdatlist.size();
-        for (int i =0; i<max; i++){
-            AuthData atok = authdatlist.get(i);
-                if (atok.getAuthToken().equals(authtok)) {
-                    authdatlist.remove(i);
-                    break;
+    public void deleteAuth(String authtok) throws IncorrectAuthTokenException {
+        AuthData authData = getAuth(authtok);
+        if(authData==null){
+            throw new IncorrectAuthTokenException("Error: Incorrect Auth Token");
             }
+        authdatlist.remove(authData);
         }
     }
-}
 
 /*clear: A method for clearing all data from the database. This is used during testing.
 

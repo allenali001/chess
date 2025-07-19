@@ -23,9 +23,5 @@ public class AuthService {
             throw new IncorrectAuthTokenException("Error: Incorrect Auth Token");
         }
     }
-    public void logout(String authToken) throws IncorrectAuthTokenException {
-        valAuthToken(authToken);
-        authDAO.deleteAuth(authToken);
-    }
 }
 
