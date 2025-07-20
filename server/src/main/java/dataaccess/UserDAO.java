@@ -7,13 +7,6 @@ import java.util.List;
 public class UserDAO {
     private final List<UserData> userslist = new ArrayList<>();
 
-    void insertUser(UserData u) throws DataAccessException{
-        if (getUser(u.getUsername())!=null){
-            throw new DataAccessException("Error: Username already taken");
-        }
-        createUser(u);
-    }
-
     public UserData getUser(String username) {
         if (username!=null){
             for (UserData u:userslist){

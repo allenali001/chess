@@ -34,22 +34,6 @@ public class GameDAO {
     public List<GameData> listGames(){
         return new ArrayList<>(gameDataList);
     }
-    public void updateGame(GameData updated){
-        int listSize;
-        listSize = gameDataList.size();
-        int i = 0;
-        while (true) {
-            if (i >= listSize) {
-                break;
-            }
-            if (updated.getGameID() == gameDataList.get(i).getGameID()){
-                gameDataList.set(i,updated);
-                return;
-            }
-            i += 1;
-        }
-    }
-
 
 }
 /*
