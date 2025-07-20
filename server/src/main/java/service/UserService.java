@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
 import models.AuthData;
 import models.UserData;
@@ -17,7 +18,7 @@ public class UserService {
         this.userDAO=userDAO;
         this.authDAO=authDAO;
     }
-    public RegisterResult register(RegisterRequest registerRequest)throws AlreadyTakenException, MissingParameterException {
+    public RegisterResult register(RegisterRequest registerRequest)throws AlreadyTakenException, MissingParameterException , DataAccessException {
         if (userDAO.getUser(registerRequest.username()) != null) {
             throw new AlreadyTakenException("Error: Username is already taken");
         }if (registerRequest.username()==null ||registerRequest.username().isBlank() || registerRequest.password()==null || registerRequest.password().isBlank() ||registerRequest.email()==null || registerRequest.email().isBlank()){
@@ -30,7 +31,7 @@ public class UserService {
         return new RegisterResult(userdata.getUsername(), auth.getAuthToken(), null);
     }
 
-    public LoginResult login(LoginRequest loginRequest) throws NoSuchUserException, WrongPassWordException, MissingParameterException {
+    public LoginResult login(LoginRequest loginRequest) throws NoSuchUserException, WrongPassWordException, MissingParameterException, DataAccessException{
         if (loginRequest.username() == null || loginRequest.username().isBlank() ||
                 loginRequest.password()==null || loginRequest.password().isBlank()) {
             throw new MissingParameterException("Error: Missing a parameter");
@@ -47,7 +48,7 @@ public class UserService {
         authData = authDAO.createAuth(username1.getUsername());
         return new LoginResult(username1.getUsername(), authData.getAuthToken(), null);
     }
-    public void logout(String authToken) throws IncorrectAuthTokenException {
+    public void logout(String authToken) throws IncorrectAuthTokenException, DataAccessException {
         authDAO.deleteAuth(authToken);
     }
 }

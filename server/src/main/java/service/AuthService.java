@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
 import service.exceptions.IncorrectAuthTokenException;
 import models.AuthData;
 
@@ -10,7 +11,7 @@ public class AuthService {
         this.authDAO = authDAO;
     }
 
-    public AuthData valAuthToken(String authToken) throws IncorrectAuthTokenException {
+    public AuthData valAuthToken(String authToken) throws DataAccessException, IncorrectAuthTokenException {
         if (authToken == null || authToken.isBlank()) {
             throw new IncorrectAuthTokenException("Error: No Auth Token Entered");
         }

@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.DataAccessException;
 import models.AuthData;
 import models.GameData;
 import server.request.CreateGameRequest;
@@ -21,7 +22,7 @@ public class GameService {
         this.gameDAO = gameDAO;
         this.authService = authService;
     }
-    public CreateGameResult createGame(String authToken, CreateGameRequest request) throws IncorrectAuthTokenException, MissingParameterException {
+    public CreateGameResult createGame(String authToken, CreateGameRequest request) throws IncorrectAuthTokenException, DataAccessException, MissingParameterException {
         authService.valAuthToken(authToken);
         if (request == null || request.gameName() == null || request.gameName().isBlank()) {
             throw new MissingParameterException("Error: Missing a parameter");
@@ -29,7 +30,7 @@ public class GameService {
         GameData game = gameDAO.createGame(request.gameName());
         return new CreateGameResult(game.getGameID(), null);
     }
-    public void joinGame(JoinGameRequest joinGameRequest) throws IncorrectAuthTokenException, AlreadyTakenException, NoGameException, Forbidden {
+    public void joinGame(JoinGameRequest joinGameRequest) throws DataAccessException, IncorrectAuthTokenException, AlreadyTakenException, NoGameException, Forbidden {
         AuthData authData = authService.valAuthToken(joinGameRequest.authToken());
         String username = authData.getUsername();
         GameData game = gameDAO.getGame(joinGameRequest.gameID());
@@ -57,7 +58,7 @@ public class GameService {
         }
         new JoinGameResult(null);
     }
-   public ListGameResult listGame(ListGameRequest listGamerRequest) throws IncorrectAuthTokenException{
+   public ListGameResult listGame(ListGameRequest listGamerRequest) throws IncorrectAuthTokenException, DataAccessException {
         authService.valAuthToken(listGamerRequest.authToken());
         List<GameData> games;
         games = gameDAO.listGames();

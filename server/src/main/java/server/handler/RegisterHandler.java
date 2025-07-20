@@ -1,5 +1,6 @@
 package server.handler;
 
+import dataaccess.DataAccessException;
 import server.request.RegisterRequest;
 import server.result.RegisterResult;
 import service.UserService;
@@ -28,6 +29,8 @@ public class RegisterHandler implements Route {
             result = toJson(res, 403, new RegisterResult(null, null, Ex.getMessage()));
         }catch (MissingParameterException Ex){
             result = toJson(res,400, new RegisterResult(null,null,Ex.getMessage()));
+        }catch (DataAccessException Ex){
+            result = toJson(res, 500, new RegisterResult(null,null, Ex.getMessage()));
         }
         return result;
     }

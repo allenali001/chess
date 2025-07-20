@@ -1,0 +1,89 @@
+package service;
+
+import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
+import dataaccess.GameDAO;
+import dataaccess.UserDAO;
+import models.AuthData;
+import models.UserData;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import server.request.CreateGameRequest;
+import server.request.JoinGameRequest;
+import server.request.ListGameRequest;
+import server.result.CreateGameResult;
+import server.result.ListGameResult;
+import service.exceptions.IncorrectAuthTokenException;
+import service.exceptions.MissingParameterException;
+import service.exceptions.NoGameException;
+
+import static org.junit.jupiter.api.Assertions.*;
+class GameServiceTest {
+    private GameDAO gameDAO;
+    private GameService gameService;
+    private String authTok;
+
+    @BeforeEach
+    void setUp() throws DataAccessException {
+        UserDAO userDAO = new UserDAO();
+        gameDAO = new GameDAO();
+        AuthDAO authDAO = new AuthDAO();
+        AuthService authService = new AuthService(authDAO);
+        gameService = new GameService(gameDAO, authService);
+        userDAO.createUser(new UserData("username","password","email"));
+        AuthData authData = authDAO.createAuth("username");
+        authTok=authData.getAuthToken();
+    }
+
+    @Test
+    void createGamePositive() throws Exception {
+        CreateGameRequest req = new CreateGameRequest("gameName");
+        CreateGameResult result = gameService.createGame(authTok, req);
+        System.out.println(result);
+        assertNotNull(result);
+        assertFalse(result.gameID() <= 0);
+    }
+
+    @Test
+    void createGameException() {
+        Exception Ex = assertThrows(Exception.class, () -> {
+            gameService.createGame(authTok, new CreateGameRequest(null));
+        });
+        System.out.println(Ex.getMessage());
+    }
+    @Test
+    void joinGamePositive() throws Exception {
+        int gameID = gameService.createGame(authTok, new CreateGameRequest("gameName")).gameID();
+        JoinGameRequest joinReq = new JoinGameRequest(authTok, gameID, "BLACK");
+        gameService.joinGame(joinReq);
+        assertEquals("username", gameDAO.getGame(gameID).getBlackUsername());
+    }
+
+    @Test
+    void joinGameException() {
+        Exception ex = assertThrows(Exception.class, () -> {
+            gameService.joinGame(new JoinGameRequest(authTok, 1234,"BLACK")); // Invalid game ID
+        });
+        System.out.println(ex.getMessage());
+    }
+
+    @Test
+    void listGamePositive() throws Exception {
+        gameService.createGame(authTok, new CreateGameRequest("gameName1"));
+        gameService.createGame(authTok, new CreateGameRequest("gameName2"));
+        gameService.createGame(authTok, new CreateGameRequest("gameName3"));
+        ListGameRequest listReq = new ListGameRequest(authTok);
+        ListGameResult result = gameService.listGame(listReq);
+        System.out.println(result);
+        assertNotNull(result);
+        assertEquals(3, result.games().size());
+    }
+
+    @Test
+    void listGameException() {
+        Exception Ex = assertThrows(Exception.class, () -> {
+            gameService.listGame(new ListGameRequest("invalid"));
+        });
+        System.out.println(Ex.getMessage());
+    }
+}

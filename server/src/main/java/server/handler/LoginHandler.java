@@ -1,4 +1,5 @@
 package server.handler;
+import dataaccess.DataAccessException;
 import server.request.LoginRequest;
 import service.exceptions.MissingParameterException;
 import spark.Request;
@@ -28,6 +29,8 @@ public class LoginHandler implements Route {
             result = toJson(res, 401, new LoginResult(null, null, Ex.getMessage()));
         }catch (MissingParameterException Ex){
             result = toJson(res, 400, new LoginResult(null,null,Ex.getMessage()));
+        }catch (DataAccessException Ex){
+            result = toJson(res, 500, new LoginResult(null,null, Ex.getMessage()));
         }
         return result;
     }
