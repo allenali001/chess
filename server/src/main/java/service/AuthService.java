@@ -5,23 +5,19 @@ import service.exceptions.IncorrectAuthTokenException;
 import models.AuthData;
 
 public class AuthService {
-    private final AuthDAO authDAO = new AuthDAO();
+    private final AuthDAO authDAO;
+    public AuthService(AuthDAO authDAO) {
+        this.authDAO = authDAO;
+    }
 
     public AuthData valAuthToken(String authToken) throws IncorrectAuthTokenException {
-        if (authToken != null) {
-            if (!authToken.isBlank()) {
-                AuthData auth = authDAO.getAuth(authToken);
-                if (auth == null) {
-                    throw new IncorrectAuthTokenException("Error: No Auth Token");
-                } else {
-                    return auth;
-                }
-            } else {
-                throw new IncorrectAuthTokenException("Error: Incorrect Auth Token");
-            }
-        } else {
-            throw new IncorrectAuthTokenException("Error: Incorrect Auth Token");
+        if (authToken == null || authToken.isBlank()) {
+            throw new IncorrectAuthTokenException("Error: No Auth Token Entered");
         }
+        AuthData authTok = authDAO.getAuth(authToken);
+        if (authTok == null) {
+            throw new IncorrectAuthTokenException("Error: Invalid Auth Token");
+        }
+        return authTok;
     }
 }
-

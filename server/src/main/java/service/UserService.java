@@ -4,9 +4,7 @@ import dataaccess.AuthDAO;
 import dataaccess.UserDAO;
 import models.AuthData;
 import models.UserData;
-import org.eclipse.jetty.server.Authentication;
 import server.request.LoginRequest;
-import server.request.LogoutRequest;
 import server.request.RegisterRequest;
 import server.result.LoginResult;
 import server.result.RegisterResult;
@@ -22,9 +20,7 @@ public class UserService {
     public RegisterResult register(RegisterRequest registerRequest)throws AlreadyTakenException, MissingParameterException {
         if (userDAO.getUser(registerRequest.username()) != null) {
             throw new AlreadyTakenException("Error: Username is already taken");
-        }if (registerRequest.username()==null ||registerRequest.username().isBlank()
-            || registerRequest.password()==null || registerRequest.password().isBlank()
-            ||registerRequest.email()==null || registerRequest.email().isBlank()){
+        }if (registerRequest.username()==null ||registerRequest.username().isBlank() || registerRequest.password()==null || registerRequest.password().isBlank() ||registerRequest.email()==null || registerRequest.email().isBlank()){
             throw new MissingParameterException("Error: Missing a parameter");
         }
         UserData userdata = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());

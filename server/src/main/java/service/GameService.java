@@ -6,57 +6,58 @@ import server.request.CreateGameRequest;
 import server.request.JoinGameRequest;
 import server.request.ListGameRequest;
 import server.result.CreateGameResult;
+import server.result.JoinGameResult;
 import server.result.ListGameResult;
-import service.exceptions.AlreadyTakenException;
-import service.exceptions.IncorrectAuthTokenException;
+import service.exceptions.*;
 import dataaccess.GameDAO;
-import service.exceptions.NoGameException;
 
 import java.util.List;
 
 public class GameService {
-    private final GameDAO gameDAO=new GameDAO();
-    public CreateGameResult create(CreateGameRequest createGameRequest) throws IncorrectAuthTokenException {
-        AuthService authService;
-        authService = new AuthService();
-        authService.valAuthToken(createGameRequest.authToken());
-        GameData game;
-        game = gameDAO.createGame(createGameRequest.gameName());
-        return new CreateGameResult(game.getGameID(),null);
+    private final GameDAO gameDAO;
+    private final AuthService authService;
+
+    public GameService(GameDAO gameDAO, AuthService authService) {
+        this.gameDAO = gameDAO;
+        this.authService = authService;
     }
-    public void joinGame(JoinGameRequest joinGameRequest) throws IncorrectAuthTokenException, AlreadyTakenException, NoGameException {
-        AuthService authService;
-        authService = new AuthService();
-        AuthData authData;
-        authData = authService.valAuthToken(joinGameRequest.authToken());
+    public CreateGameResult createGame(String authToken, CreateGameRequest request) throws IncorrectAuthTokenException, MissingParameterException {
+        authService.valAuthToken(authToken);
+        if (request == null || request.gameName() == null || request.gameName().isBlank()) {
+            throw new MissingParameterException("Error: Missing a parameter");
+        }
+        GameData game = gameDAO.createGame(request.gameName());
+        return new CreateGameResult(game.getGameID(), null);
+    }
+    public void joinGame(JoinGameRequest joinGameRequest) throws IncorrectAuthTokenException, AlreadyTakenException, NoGameException, Forbidden {
+        AuthData authData = authService.valAuthToken(joinGameRequest.authToken());
         String username = authData.getUsername();
-        GameData game;
-        game = gameDAO.getGame(joinGameRequest.gameID());
-        if (game != null) {
-            String color;
-            color = joinGameRequest.playerColor();
-            if (color.equals("WHITE")) {
-                if (game.getWhiteUsername() == null) {
-                   game.setWhiteUsername(username);
-                } else {
-                    throw new AlreadyTakenException("Error: This color is already taken by another player");
-                }
+        GameData game = gameDAO.getGame(joinGameRequest.gameID());
+        if (game == null) {
+            throw new NoGameException("Error: No game with this GameID exists");
+        }
+        String color;
+        color = joinGameRequest.playerColor();
+        if (!"WHITE".equals(color) && !"BLACK".equals(color)) {
+            throw new Forbidden("Error: Invalid Color Entered");
+
+        }
+        if (color.equals("WHITE")) {
+            if (game.getWhiteUsername() == null) {
+                game.setWhiteUsername(username);
             } else {
-                if (color.equals("BLACK")) {
-                    if (game.getBlackUsername() == null) {
-                        game.setBlackUsername(username);
-                    }else{
-                        throw new AlreadyTakenException("Error: This color is already taken by another player");
-                    }
-                }
+                throw new AlreadyTakenException("Error: This color is already taken by another player");
             }
         } else {
-            throw new NoGameException("Error: Game ID does not exist");
+            if (game.getBlackUsername() == null) {
+                game.setBlackUsername(username);
+            } else {
+                throw new AlreadyTakenException("Error: This color is already taken by another player");
+            }
         }
+        new JoinGameResult(null);
     }
-    public ListGameResult listGame(ListGameRequest listGamerRequest) throws IncorrectAuthTokenException{
-        AuthService authService;
-        authService = new AuthService();
+   public ListGameResult listGame(ListGameRequest listGamerRequest) throws IncorrectAuthTokenException{
         authService.valAuthToken(listGamerRequest.authToken());
         List<GameData> games;
         games = gameDAO.listGames();
