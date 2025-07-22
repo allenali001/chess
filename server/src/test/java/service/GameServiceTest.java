@@ -49,7 +49,7 @@ class GameServiceTest {
         Exception ex= assertThrows(Exception.class, () -> {
             gameService.createGame(authTok, new CreateGameRequest(null));
         });
-        System.out.println(Ex.getMessage());
+        System.out.println(ex.getMessage());
     }
     @Test
     void joinGamePositive() throws Exception {
@@ -84,6 +84,6 @@ class GameServiceTest {
         Exception ex= assertThrows(Exception.class, () -> {
             gameService.listGame(new ListGameRequest("invalid"));
         });
-        System.out.println(Ex.getMessage());
+        System.out.println(ex.getMessage());
     }
 }

@@ -29,6 +29,6 @@ class AuthServiceTest {
         Exception ex= assertThrows(Exception.class, () -> {
             authService.valAuthToken("authtok");
         });
-        System.out.println(Ex.getMessage());
+        System.out.println(ex.getMessage());
     }
 }
