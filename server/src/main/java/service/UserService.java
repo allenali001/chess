@@ -18,10 +18,16 @@ public class UserService {
         this.userDAO=userDAO;
         this.authDAO=authDAO;
     }
-    public RegisterResult register(RegisterRequest registerRequest)throws AlreadyTakenException, MissingParameterException , DataAccessException {
+    public RegisterResult register(RegisterRequest registerRequest)throws
+            AlreadyTakenException, MissingParameterException , DataAccessException {
         if (userDAO.getUser(registerRequest.username()) != null) {
             throw new AlreadyTakenException("Error: Username is already taken");
-        }if (registerRequest.username()==null ||registerRequest.username().isBlank() || registerRequest.password()==null || registerRequest.password().isBlank() ||registerRequest.email()==null || registerRequest.email().isBlank()){
+        }if (registerRequest.username()==null ||
+                registerRequest.username().isBlank() ||
+                registerRequest.password()==null ||
+                registerRequest.password().isBlank() ||
+                registerRequest.email()==null ||
+                registerRequest.email().isBlank()){
             throw new MissingParameterException("Error: Missing a parameter");
         }
         UserData userdata = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
@@ -31,9 +37,13 @@ public class UserService {
         return new RegisterResult(userdata.getUsername(), auth.getAuthToken(), null);
     }
 
-    public LoginResult login(LoginRequest loginRequest) throws NoSuchUserException, WrongPassWordException, MissingParameterException, DataAccessException{
-        if (loginRequest.username() == null || loginRequest.username().isBlank() ||
-                loginRequest.password()==null || loginRequest.password().isBlank()) {
+    public LoginResult login(LoginRequest loginRequest) throws
+            NoSuchUserException, WrongPassWordException,
+            MissingParameterException, DataAccessException{
+        if (loginRequest.username() == null ||
+                loginRequest.username().isBlank() ||
+                loginRequest.password()==null ||
+                loginRequest.password().isBlank()) {
             throw new MissingParameterException("Error: Missing a parameter");
         }
         UserData username1;
@@ -48,7 +58,8 @@ public class UserService {
         authData = authDAO.createAuth(username1.getUsername());
         return new LoginResult(username1.getUsername(), authData.getAuthToken(), null);
     }
-    public void logout(String authToken) throws IncorrectAuthTokenException, DataAccessException {
+    public void logout(String authToken) throws
+            IncorrectAuthTokenException, DataAccessException {
         authDAO.deleteAuth(authToken);
     }
 }

@@ -13,9 +13,9 @@ import java.util.Objects;
 public class ChessPiece {
     private final ChessGame.TeamColor pieceColor;
     private final PieceType type;
-    public ChessPiece(ChessGame.TeamColor color, ChessPiece.PieceType Ptype) {
+    public ChessPiece(ChessGame.TeamColor color, ChessPiece.PieceType pType) {
         pieceColor= color;
-        type=Ptype;
+        type=pType;
     }
 
     @Override

@@ -9,8 +9,8 @@ import spark.Route;
 import server.result.LoginResult;
 import service.exceptions.WrongPassWordException;
 import service.exceptions.NoSuchUserException;
-import static server.helper.jsonHelper.fromJson;
-import static server.helper.jsonHelper.toJson;
+import static server.helper.JsonHelper.fromJson;
+import static server.helper.JsonHelper.toJson;
 
 
 public class LoginHandler implements Route {

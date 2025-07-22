@@ -36,7 +36,7 @@ class UserServiceTest {
 
     @Test
     void registerException(){
-        Exception Ex = assertThrows(Exception.class,()->{
+        Exception ex= assertThrows(Exception.class,()->{
             userService.register(new RegisterRequest(null,null,"email"));
         });
         System.out.println(Ex.getMessage());
@@ -56,7 +56,7 @@ class UserServiceTest {
 
     @Test
     void loginException(){
-        Exception Ex = assertThrows(Exception.class,()->{
+        Exception ex= assertThrows(Exception.class,()->{
             userService.login(new LoginRequest("username",null));
         });
         System.out.println(Ex.getMessage());
@@ -78,7 +78,7 @@ class UserServiceTest {
 
      @Test
     void logoutException(){
-         Exception Ex = assertThrows(Exception.class,()->{
+         Exception ex= assertThrows(Exception.class,()->{
             userService.logout("invalid");
         });
          System.out.println(Ex.getMessage());

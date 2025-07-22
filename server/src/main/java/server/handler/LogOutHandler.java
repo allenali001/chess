@@ -8,7 +8,7 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
-import static server.helper.jsonHelper.*;
+import static server.helper.JsonHelper.*;
 
 
 public class LogOutHandler implements Route {

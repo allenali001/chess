@@ -1,7 +1,6 @@
 package dataaccess;
 import models.UserData;
 
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,8 +38,3 @@ public class UserDAO {
     }
 }
 
-
-/*createUser: Create a new user.
-        getUser: Retrieve a user with the given username.
- clear
- */

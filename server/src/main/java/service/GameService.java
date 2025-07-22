@@ -22,7 +22,9 @@ public class GameService {
         this.gameDAO = gameDAO;
         this.authService = authService;
     }
-    public CreateGameResult createGame(String authToken, CreateGameRequest request) throws IncorrectAuthTokenException, DataAccessException, MissingParameterException {
+    public CreateGameResult createGame(String authToken, CreateGameRequest request)
+            throws IncorrectAuthTokenException, DataAccessException,
+            MissingParameterException {
         authService.valAuthToken(authToken);
         if (request == null || request.gameName() == null || request.gameName().isBlank()) {
             throw new MissingParameterException("Error: Missing a parameter");
@@ -30,7 +32,9 @@ public class GameService {
         GameData game = gameDAO.createGame(request.gameName());
         return new CreateGameResult(game.getGameID(), null);
     }
-    public void joinGame(JoinGameRequest joinGameRequest) throws DataAccessException, IncorrectAuthTokenException, AlreadyTakenException, NoGameException, Forbidden {
+    public void joinGame(JoinGameRequest joinGameRequest)
+            throws DataAccessException, IncorrectAuthTokenException,
+            AlreadyTakenException, NoGameException, Forbidden {
         AuthData authData = authService.valAuthToken(joinGameRequest.authToken());
         String username = authData.getUsername();
         GameData game = gameDAO.getGame(joinGameRequest.gameID());
@@ -53,7 +57,8 @@ public class GameService {
             if (game.getBlackUsername() == null) {
                 game.setBlackUsername(username);
             } else {
-                throw new AlreadyTakenException("Error: This color is already taken by another player");
+                throw new AlreadyTakenException
+                        ("Error: This color is already taken by another player");
             }
         }
         new JoinGameResult(null);

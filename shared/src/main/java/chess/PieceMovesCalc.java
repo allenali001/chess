@@ -3,7 +3,6 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 public class PieceMovesCalc {
     public Collection<ChessMove> calculateMoves(ChessBoard board,
@@ -27,18 +26,14 @@ public class PieceMovesCalc {
         }
     }
 
-    //KING
     private Collection<ChessMove> calcKingMoves(ChessBoard board,
                                                 ChessPosition position,
                                                 ChessPiece piece) {
-        //king can go one space any direction, including diagonals
         List<ChessMove> moves = new ArrayList<>();
         int[][] direction = {
                 {0, 1}, {1, 0}, {0, -1}, {-1, 0},
-                // left, right, up down
                 {1, 1}, {1, -1}, {-1, 1}, {-1, -1}
         };
-        //diagonals
         for (int[] mov : direction) {
             int newRow = position.getRow() + mov[0];
             int newCol = position.getColumn() + mov[1];
@@ -60,14 +55,14 @@ public class PieceMovesCalc {
     }
 
 
-    //QUEEN
+
     private Collection<ChessMove> calcQueenMoves(ChessBoard board,
                                                  ChessPosition position,
                                                  ChessPiece piece) {
         List<ChessMove> moves = new ArrayList<>();
         int[][] direction = {
-                {0, 1}, {1, 0}, {0, -1}, {-1, 0},//left, right, up down
-                {1, 1}, {1, -1}, {-1, 1}, {-1, -1}//diagonals
+                {0, 1}, {1, 0}, {0, -1}, {-1, 0},
+                {1, 1}, {1, -1}, {-1, 1}, {-1, -1}
         };
         for (int[] mov : direction) {
             int newRow = position.getRow();
@@ -94,13 +89,13 @@ public class PieceMovesCalc {
     }
 
 
-    //BISHOP
+
     private Collection<ChessMove> calcBishopMoves(ChessBoard board,
                                                   ChessPosition position,
                                                   ChessPiece piece) {
         List<ChessMove> moves = new ArrayList<>();
         int[][] direction = {
-                {1, 1}, {1, -1}, {-1, 1}, {-1, -1} //up right, up left, down right, down left
+                {1, 1}, {1, -1}, {-1, 1}, {-1, -1}
         };
         for (int[] dir : direction) {
             int newRow = position.getRow();
@@ -109,8 +104,6 @@ public class PieceMovesCalc {
                 newRow += dir[0];
                 newCol += dir[1];
                 if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) {
-                    // make sure it's in the bounds of the chess board
-                    //cant be less than one or greater than 8
                     break;
                 }
                 ChessPosition newPos = new ChessPosition(newRow, newCol);
@@ -129,7 +122,7 @@ public class PieceMovesCalc {
         return moves;
     }
 
-    //PAWN
+
     private Collection<ChessMove> calcPawnMoves(ChessBoard board,
                                                 ChessPosition position,
                                                 ChessPiece piece) {
@@ -142,7 +135,6 @@ public class PieceMovesCalc {
         }
         int row = position.getRow();
         int col = position.getColumn();
-        //moveone
         int oneclear=row+dir;
         if (oneclear >=1 &&oneclear<=8 && col>=1 && col<=8){
             ChessPosition moveone=new ChessPosition(oneclear,col);
@@ -152,7 +144,6 @@ public class PieceMovesCalc {
                 }else{
                 moves.add(new ChessMove(position,moveone,null));
             }
-        //movetwo if first
             if (row == strt) {
                 ChessPosition movetwo = new ChessPosition(row + 2 * dir, col);
                 int tworow = movetwo.getRow();
@@ -165,7 +156,6 @@ public class PieceMovesCalc {
             }
 
 
-            //capture left
                 int leftrow = row+dir;
                 int leftcol = col-1;
                 if (leftrow>=1 &&leftrow<=8 &&leftcol>=1 && leftcol<=8) {
@@ -180,7 +170,6 @@ public class PieceMovesCalc {
 
                     }
                 }
-                //capright
                 int rightrow=row+dir;
                 int rightcol=col+1;
                 if (rightrow>=1 && rightrow<= 8 && rightcol>=1 &&rightcol<=8) {
@@ -217,13 +206,13 @@ public class PieceMovesCalc {
 
 
 
-    //ROOK
+
     private Collection<ChessMove> calcRookMoves(ChessBoard board,
                                                 ChessPosition position,
                                                 ChessPiece piece) {
         List<ChessMove> moves = new ArrayList<>();
         int[][] direction = {
-                {1, 0}, {0, 1}, {-1, 0}, {0, -1}}; //up down left right
+                {1, 0}, {0, 1}, {-1, 0}, {0, -1}};
         for (int[] dir : direction) {
             int newRow = position.getRow();
             int newCol = position.getColumn();
@@ -231,8 +220,6 @@ public class PieceMovesCalc {
                 newRow += dir[0];
                 newCol += dir[1];
                 if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) {
-                    // make sure it's in the bounds of the chess board
-                    //cant be less than one or greater than 8
                     break;
                 }
                 ChessPosition newPos = new ChessPosition(newRow, newCol);
@@ -251,7 +238,7 @@ public class PieceMovesCalc {
     }
 
 
-    //KNIGHT
+
 private Collection<ChessMove> calcKnightMoves(ChessBoard board,
                                               ChessPosition position,
                                               ChessPiece piece) {
@@ -262,8 +249,6 @@ private Collection<ChessMove> calcKnightMoves(ChessBoard board,
         int newRow = position.getRow() + dir[0];
         int newCol = position.getColumn() + dir[1];
         if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) {
-            // make sure it's in the bounds of the chess board
-            //can't be less than one or greater than 8
             continue;
         }
         ChessPosition newPos = new ChessPosition(newRow, newCol);

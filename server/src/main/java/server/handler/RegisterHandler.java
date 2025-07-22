@@ -10,8 +10,8 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
-import static server.helper.jsonHelper.fromJson;
-import static server.helper.jsonHelper.toJson;
+import static server.helper.JsonHelper.fromJson;
+import static server.helper.JsonHelper.toJson;
 
 public class RegisterHandler implements Route {
     private final UserService userService;

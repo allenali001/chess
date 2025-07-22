@@ -56,6 +56,18 @@ public class DatabaseManager {
      * }
      * </code>
      */
+    public void databaseShow() throws Exception {
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("SHOW DATABASES")) {
+                var rs = preparedStatement.executeQuery();
+                while (rs.next()) {
+                    String dbName = rs.getString(1);
+                    System.out.println(dbName);
+                }
+            }
+        }
+    }
+
     static Connection getConnection() throws DataAccessException {
         try {
             //do not wrap the following line with a try-with-resources

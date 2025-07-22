@@ -9,7 +9,7 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
-import static server.helper.jsonHelper.toJson;
+import static server.helper.JsonHelper.toJson;
 
 public class ListGameHandler implements Route {
     private final GameService gameService;

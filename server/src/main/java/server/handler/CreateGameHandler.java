@@ -9,8 +9,8 @@ import service.exceptions.MissingParameterException;
 import spark.Request;
 import spark.Response;
 import spark.Route;
-import static server.helper.jsonHelper.fromJson;
-import static server.helper.jsonHelper.toJson;
+import static server.helper.JsonHelper.fromJson;
+import static server.helper.JsonHelper.toJson;
 
 
 public class CreateGameHandler implements Route {
@@ -26,12 +26,12 @@ public class CreateGameHandler implements Route {
             CreateGameRequest createGameRequest = fromJson(req,CreateGameRequest.class );
             CreateGameResult createGameResult = gameService.createGame(authToken,createGameRequest);
             result = toJson(res, 200, createGameResult);
-        }catch (IncorrectAuthTokenException Ex){
-            result = toJson(res,401, new CreateGameResult(null,Ex.getMessage()));
-        }catch (MissingParameterException Ex){
-            result = toJson(res,400, new CreateGameResult(null, Ex.getMessage()));
-        }catch (DataAccessException Ex){
-            result=toJson(res, 500, new CreateGameResult(null, Ex.getMessage()));
+        }catch (IncorrectAuthTokenException ex){
+            result = toJson(res,401, new CreateGameResult(null,ex.getMessage()));
+        }catch (MissingParameterException ex){
+            result = toJson(res,400, new CreateGameResult(null, ex.getMessage()));
+        }catch (DataAccessException ex){
+            result=toJson(res, 500, new CreateGameResult(null, ex.getMessage()));
         }
         return result;
     }

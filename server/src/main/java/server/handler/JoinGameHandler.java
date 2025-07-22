@@ -11,8 +11,8 @@ import service.exceptions.NoGameException;
 import spark.Request;
 import spark.Response;
 import spark.Route;
-import static server.helper.jsonHelper.fromJson;
-import static server.helper.jsonHelper.toJson;
+import static server.helper.JsonHelper.fromJson;
+import static server.helper.JsonHelper.toJson;
 
 
 public class JoinGameHandler implements Route {

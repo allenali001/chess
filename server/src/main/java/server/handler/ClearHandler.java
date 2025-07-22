@@ -7,7 +7,7 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
-import static server.helper.jsonHelper.toJson;
+import static server.helper.JsonHelper.toJson;
 
 public class ClearHandler implements Route {
     private final ClearService clearService;
