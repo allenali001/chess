@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.AuthDAO;
+import dataaccess.AuthDaoMemory;
 import models.AuthData;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -11,7 +12,7 @@ class AuthServiceTest {
 
     @BeforeEach
     void setUp() {
-        authDAO = new AuthDAO();
+        authDAO = new AuthDaoMemory();
         authService = new AuthService(authDAO);
     }
 

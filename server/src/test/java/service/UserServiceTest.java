@@ -1,17 +1,14 @@
 package service;
 
 import dataaccess.AuthDAO;
-import dataaccess.GameDAO;
-import dataaccess.UserDAO;
+import dataaccess.AuthDaoMemory;
+import dataaccess.UserDaoMemory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.request.LoginRequest;
 import server.request.RegisterRequest;
 import server.result.LoginResult;
 import server.result.RegisterResult;
-import service.exceptions.AlreadyTakenException;
-import service.exceptions.IncorrectAuthTokenException;
-import service.exceptions.MissingParameterException;
 
 import static org.junit.jupiter.api.Assertions.*;
 class UserServiceTest {
@@ -19,9 +16,9 @@ class UserServiceTest {
     private UserService userService;
     @BeforeEach
     void setUp() {
-        UserDAO userDAO = new UserDAO();
-        authDAO=new AuthDAO();
-        userService=new UserService(userDAO,authDAO);
+        UserDaoMemory userDaoMemory = new UserDaoMemory();
+        authDAO = new AuthDaoMemory();
+        userService = new UserService(userDaoMemory, authDAO);
     }
 
     @Test

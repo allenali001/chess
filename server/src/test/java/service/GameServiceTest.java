@@ -1,9 +1,6 @@
 package service;
 
-import dataaccess.AuthDAO;
-import dataaccess.DataAccessException;
-import dataaccess.GameDAO;
-import dataaccess.UserDAO;
+import dataaccess.*;
 import models.AuthData;
 import models.UserData;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,24 +10,21 @@ import server.request.JoinGameRequest;
 import server.request.ListGameRequest;
 import server.result.CreateGameResult;
 import server.result.ListGameResult;
-import service.exceptions.IncorrectAuthTokenException;
-import service.exceptions.MissingParameterException;
-import service.exceptions.NoGameException;
 
 import static org.junit.jupiter.api.Assertions.*;
 class GameServiceTest {
-    private GameDAO gameDAO;
+    private GameDaoMemory gameDaoMemory;
     private GameService gameService;
     private String authTok;
 
     @BeforeEach
     void setUp() throws DataAccessException {
-        UserDAO userDAO = new UserDAO();
-        gameDAO = new GameDAO();
-        AuthDAO authDAO = new AuthDAO();
+        UserDaoMemory userDaoMemory = new UserDaoMemory();
+        gameDaoMemory = new GameDaoMemory();
+        AuthDAO authDAO = new AuthDaoMemory();
         AuthService authService = new AuthService(authDAO);
-        gameService = new GameService(gameDAO, authService);
-        userDAO.createUser(new UserData("username","password","email"));
+        gameService = new GameService(gameDaoMemory, authService);
+        userDaoMemory.createUser(new UserData("username","password","email"));
         AuthData authData = authDAO.createAuth("username");
         authTok=authData.getAuthToken();
     }
@@ -56,7 +50,7 @@ class GameServiceTest {
         int gameID = gameService.createGame(authTok, new CreateGameRequest("gameName")).gameID();
         JoinGameRequest joinReq = new JoinGameRequest(authTok, gameID, "BLACK");
         gameService.joinGame(joinReq);
-        assertEquals("username", gameDAO.getGame(gameID).getBlackUsername());
+        assertEquals("username", gameDaoMemory.getGame(gameID).getBlackUsername());
     }
 
     @Test

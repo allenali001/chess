@@ -1,8 +1,10 @@
 import chess.*;
+import dataaccess.DataAccessException;
 import server.Server;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    throws DataAccessException {
         var port = 8080;
         var server = new Server();
         server.run(port);

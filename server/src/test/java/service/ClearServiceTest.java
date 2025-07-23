@@ -1,8 +1,9 @@
 package service;
 
 import dataaccess.AuthDAO;
-import dataaccess.GameDAO;
-import dataaccess.UserDAO;
+import dataaccess.AuthDaoMemory;
+import dataaccess.GameDaoMemory;
+import dataaccess.UserDaoMemory;
 import models.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,26 +12,26 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ClearServiceTest {
 private AuthDAO authDAO;
-private UserDAO userDAO;
-private GameDAO gameDAO;
+private UserDaoMemory userDaoMemory;
+private GameDaoMemory gameDaoMemory;
 private ClearService clearService;
     @BeforeEach
     void setUp() {
-        authDAO= new AuthDAO();
-        userDAO=new UserDAO();
-        gameDAO=new GameDAO();
-        clearService=new ClearService(userDAO,authDAO,gameDAO);
+        authDAO= new AuthDaoMemory();
+        userDaoMemory =new UserDaoMemory();
+        gameDaoMemory =new GameDaoMemory();
+        clearService=new ClearService(userDaoMemory,authDAO, gameDaoMemory);
     }
 
     @Test
     void clearPositive() throws Exception{
         authDAO.createAuth("username");
-        userDAO.createUser(new UserData("username", "password", "email"));
-        gameDAO.createGame("gameName");
-        System.out.println(gameDAO);
+        userDaoMemory.createUser(new UserData("username", "password", "email"));
+        gameDaoMemory.createGame("gameName");
+        System.out.println(gameDaoMemory);
         clearService.clear();
         assertNull(authDAO.getAuth("1234"));
-        assertNull(userDAO.getUser("username"));
+        assertNull(userDaoMemory.getUser("username"));
         System.out.println(authDAO.getAuth("1234"));
     }
 }

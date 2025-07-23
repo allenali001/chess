@@ -10,16 +10,16 @@ import server.result.CreateGameResult;
 import server.result.JoinGameResult;
 import server.result.ListGameResult;
 import service.exceptions.*;
-import dataaccess.GameDAO;
+import dataaccess.GameDaoMemory;
 
 import java.util.List;
 
 public class GameService {
-    private final GameDAO gameDAO;
+    private final GameDaoMemory gameDaoMemory;
     private final AuthService authService;
 
-    public GameService(GameDAO gameDAO, AuthService authService) {
-        this.gameDAO = gameDAO;
+    public GameService(GameDaoMemory gameDaoMemory, AuthService authService) {
+        this.gameDaoMemory = gameDaoMemory;
         this.authService = authService;
     }
     public CreateGameResult createGame(String authToken, CreateGameRequest request)
@@ -29,7 +29,7 @@ public class GameService {
         if (request == null || request.gameName() == null || request.gameName().isBlank()) {
             throw new MissingParameterException("Error: Missing a parameter");
         }
-        GameData game = gameDAO.createGame(request.gameName());
+        GameData game = gameDaoMemory.createGame(request.gameName());
         return new CreateGameResult(game.getGameID(), null);
     }
     public void joinGame(JoinGameRequest joinGameRequest)
@@ -37,7 +37,7 @@ public class GameService {
             AlreadyTakenException, NoGameException, Forbidden {
         AuthData authData = authService.valAuthToken(joinGameRequest.authToken());
         String username = authData.getUsername();
-        GameData game = gameDAO.getGame(joinGameRequest.gameID());
+        GameData game = gameDaoMemory.getGame(joinGameRequest.gameID());
         if (game == null) {
             throw new NoGameException("Error: No game with this GameID exists");
         }
@@ -66,7 +66,7 @@ public class GameService {
    public ListGameResult listGame(ListGameRequest listGamerRequest) throws IncorrectAuthTokenException, DataAccessException {
         authService.valAuthToken(listGamerRequest.authToken());
         List<GameData> games;
-        games = gameDAO.listGames();
+        games = gameDaoMemory.listGames();
         return new ListGameResult(games,null);
     }
 }

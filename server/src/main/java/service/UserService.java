@@ -2,7 +2,7 @@ package service;
 
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
-import dataaccess.UserDAO;
+import dataaccess.UserDaoMemory;
 import models.AuthData;
 import models.UserData;
 import server.request.LoginRequest;
@@ -12,15 +12,15 @@ import server.result.RegisterResult;
 import service.exceptions.*;
 
 public class UserService {
-    private final UserDAO userDAO;
+    private final UserDaoMemory userDaoMemory;
     private final AuthDAO authDAO;
-    public UserService(UserDAO userDAO, AuthDAO authDAO){
-        this.userDAO=userDAO;
+    public UserService(UserDaoMemory userDaoMemory, AuthDAO authDAO){
+        this.userDaoMemory = userDaoMemory;
         this.authDAO=authDAO;
     }
     public RegisterResult register(RegisterRequest registerRequest)throws
             AlreadyTakenException, MissingParameterException , DataAccessException {
-        if (userDAO.getUser(registerRequest.username()) != null) {
+        if (userDaoMemory.getUser(registerRequest.username()) != null) {
             throw new AlreadyTakenException("Error: Username is already taken");
         }if (registerRequest.username()==null ||
                 registerRequest.username().isBlank() ||
@@ -31,7 +31,7 @@ public class UserService {
             throw new MissingParameterException("Error: Missing a parameter");
         }
         UserData userdata = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
-        userDAO.createUser(userdata);
+        userDaoMemory.createUser(userdata);
         AuthData auth;
         auth = authDAO.createAuth(userdata.getUsername());
         return new RegisterResult(userdata.getUsername(), auth.getAuthToken(), null);
@@ -47,7 +47,7 @@ public class UserService {
             throw new MissingParameterException("Error: Missing a parameter");
         }
         UserData username1;
-        username1 = userDAO.getUser(loginRequest.username());
+        username1 = userDaoMemory.getUser(loginRequest.username());
         if (username1 == null) {
             throw new NoSuchUserException("Error: Username does not exist");
         }
