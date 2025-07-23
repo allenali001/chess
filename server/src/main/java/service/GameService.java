@@ -10,7 +10,7 @@ import server.result.CreateGameResult;
 import server.result.JoinGameResult;
 import server.result.ListGameResult;
 import service.exceptions.*;
-import dataaccess.GameDaoMemory;
+import dataaccess.MemoryClasses.GameDaoMemory;
 
 import java.util.List;
 

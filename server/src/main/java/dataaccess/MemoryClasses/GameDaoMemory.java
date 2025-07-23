@@ -1,11 +1,13 @@
-package dataaccess;
+package dataaccess.MemoryClasses;
+import dataaccess.DAOs.GameDAO;
+import dataaccess.DataAccessException;
 import models.GameData;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class GameDaoMemory implements GameDAO{
+public class GameDaoMemory implements GameDAO {
     private final List<GameData> gameDataList = new ArrayList<>();
     private final Random rand = new Random();
 

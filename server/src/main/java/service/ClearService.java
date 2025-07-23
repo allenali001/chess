@@ -1,8 +1,8 @@
 package service;
 
-import dataaccess.AuthDAO;
-import dataaccess.UserDaoMemory;
-import dataaccess.GameDaoMemory;
+import dataaccess.DAOs.AuthDAO;
+import dataaccess.MemoryClasses.UserDaoMemory;
+import dataaccess.MemoryClasses.GameDaoMemory;
 import service.exceptions.FailureToClearException;
 
 public class ClearService {

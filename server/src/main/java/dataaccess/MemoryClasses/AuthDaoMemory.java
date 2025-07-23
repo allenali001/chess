@@ -1,4 +1,6 @@
-package dataaccess;
+package dataaccess.MemoryClasses;
+import dataaccess.DAOs.AuthDAO;
+import dataaccess.DataAccessException;
 import models.AuthData;
 import service.exceptions.IncorrectAuthTokenException;
 

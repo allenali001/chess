@@ -1,11 +1,13 @@
-package dataaccess;
+package dataaccess.MemoryClasses;
+import dataaccess.DAOs.UserDAO;
+import dataaccess.DataAccessException;
 import models.UserData;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class UserDaoMemory implements UserDAO{
+public class UserDaoMemory implements UserDAO {
     private final List<UserData> userslist = new ArrayList<>();
 
     public UserData getUser(String username) throws DataAccessException {

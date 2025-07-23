@@ -1,7 +1,7 @@
 package service;
 
-import dataaccess.AuthDAO;
-import dataaccess.AuthDaoMemory;
+import dataaccess.DAOs.AuthDAO;
+import dataaccess.MemoryClasses.AuthDaoMemory;
 import models.AuthData;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;

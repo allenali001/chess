@@ -1,6 +1,7 @@
 package dataaccess;
 
 import com.google.gson.Gson;
+import dataaccess.DAOs.AuthDAO;
 import models.AuthData;
 
 import java.sql.ResultSet;
@@ -81,19 +82,14 @@ public class AuthDaoSql implements AuthDAO {
     private static final String[] createStatements = {
             """
             CREATE TABLE IF NOT EXISTS  auth (
-              `id` int NOT NULL AUTO_INCREMENT,
-              `name` varchar(256) NOT NULL,
-              `type` ENUM('CAT', 'DOG', 'FISH', 'FROG', 'ROCK') DEFAULT 'CAT',
+              `token` VARCHAR(256) NOT NULL,
+              `username` VARCHAR(256) NOT NULL,
               `json` TEXT DEFAULT NULL,
-              PRIMARY KEY (`id`),
-              INDEX(type),
-              INDEX(name)
+              PRIMARY KEY (`token`),
+              INDEX(`username`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };
-
-    //^obviously not completed yet :) and need to change it from sample code.
-    // It's kind of just a placeholder
 
     private void configureDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();

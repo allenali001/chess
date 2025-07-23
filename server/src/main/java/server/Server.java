@@ -1,7 +1,10 @@
 package server;
 
 
-import dataaccess.*;
+import dataaccess.DAOs.AuthDAO;
+import dataaccess.MemoryClasses.AuthDaoMemory;
+import dataaccess.MemoryClasses.GameDaoMemory;
+import dataaccess.MemoryClasses.UserDaoMemory;
 import server.handler.*;
 import service.AuthService;
 import service.ClearService;
