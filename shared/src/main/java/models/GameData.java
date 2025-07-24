@@ -3,7 +3,7 @@ package models;
 import chess.ChessGame;
 
 public class GameData {
-    private final int gameID;
+    private int gameID;
     private String whiteUsername;
     private String blackUsername;
     private final String gameName;
@@ -34,4 +34,5 @@ public class GameData {
     public void setBlackUsername(String username){
         this.blackUsername = username;
     }
+    public void setID(int gameID) {this.gameID = gameID;}
 }

@@ -11,5 +11,5 @@ public interface AuthDAO {
 
     void clear() throws DataAccessException;
 
-    void deleteAuth(String authtok) throws IncorrectAuthTokenException, DataAccessException;
+    void deleteAuth(String tok) throws IncorrectAuthTokenException, DataAccessException;
 }

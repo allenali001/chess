@@ -13,10 +13,10 @@ public class AuthDaoMemory implements AuthDAO {
     private final List<AuthData> authdatlist = new ArrayList<>();
     public AuthData createAuth(String username) throws DataAccessException {
         try {
-            String tok = UUID.randomUUID().toString();
-            AuthData authdat = new AuthData(username, tok);
-            authdatlist.add(authdat);
-            return authdat;
+            String authTok = UUID.randomUUID().toString();
+            AuthData tok = new AuthData(username, authTok);
+            authdatlist.add(tok);
+            return tok;
         } catch (Exception Ex) {
             throw new DataAccessException("Create Auth data could not be accessed", Ex);
         }
@@ -37,8 +37,8 @@ public class AuthDaoMemory implements AuthDAO {
         authdatlist.clear();
     }
 
-    public void deleteAuth(String authtok) throws IncorrectAuthTokenException, DataAccessException {
-            AuthData authData = getAuth(authtok);
+    public void deleteAuth(String tok) throws IncorrectAuthTokenException, DataAccessException {
+            AuthData authData = getAuth(tok);
             if (authData == null) {
                 throw new IncorrectAuthTokenException("Error: Incorrect Auth Token");
             }
