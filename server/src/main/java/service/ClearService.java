@@ -1,26 +1,26 @@
 package service;
 
-import dataaccess.DAOs.AuthDAO;
-import dataaccess.MemoryClasses.UserDaoMemory;
-import dataaccess.MemoryClasses.GameDaoMemory;
+import dataaccess.daos.AuthDAO;
+import dataaccess.daos.GameDAO;
+import dataaccess.daos.UserDAO;
 import service.exceptions.FailureToClearException;
 
 public class ClearService {
-    private final UserDaoMemory userDaoMemory;
+    private final UserDAO userDAO;
     private final AuthDAO authDAO;
-    private final GameDaoMemory gameDaoMemory;
+    private final GameDAO gameDAO;
 
-    public ClearService(UserDaoMemory userDaoMemory, AuthDAO authDAO, GameDaoMemory gameDaoMemory) {
-        this.userDaoMemory = userDaoMemory;
+    public ClearService(UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO) {
+        this.userDAO = userDAO;
         this.authDAO = authDAO;
-        this.gameDaoMemory = gameDaoMemory;
+        this.gameDAO = gameDAO;
     }
 
     public void clear() throws FailureToClearException {
         try {
-            userDaoMemory.clear();
+            userDAO.clear();
             authDAO.clear();
-            gameDaoMemory.clear();
+            gameDAO.clear();
         } catch (Exception Ex) {
             throw new FailureToClearException("Failed to clear");
         }

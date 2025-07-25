@@ -29,7 +29,8 @@ public class JoinGameHandler implements Route {
             JoinGameRequest joinGameRequest = fromJson(req, JoinGameRequest.class);
             joinGameRequest = new JoinGameRequest(authToken, joinGameRequest.gameID(), joinGameRequest.playerColor());
             gameService.joinGame(joinGameRequest);
-            result = toJson(res, 200, new JoinGameResult(null));
+            JoinGameResult serviceResult = gameService.joinGame(joinGameRequest);
+            result = toJson(res, 200, serviceResult);
         } catch (IncorrectAuthTokenException Ex) {
             result = toJson(res, 401, new JoinGameResult(Ex.getMessage()));
         } catch (AlreadyTakenException Ex) {

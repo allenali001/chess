@@ -1,7 +1,7 @@
 package dataaccess;
 
 import com.google.gson.Gson;
-import dataaccess.DAOs.GameDAO;
+import dataaccess.daos.GameDAO;
 import models.GameData;
 
 import java.sql.ResultSet;
@@ -15,6 +15,17 @@ import static dataaccess.DaoHelper.executeUpdate;
 public class GameDaoSql implements GameDAO {
     private final Random random = new Random();
     public GameDaoSql() throws DataAccessException {
+        String[] createStatements = {
+                """
+    CREATE TABLE IF NOT EXISTS game (
+    `id` INT NOT NULL,
+    `gameName` VARCHAR(256) NOT NULL,
+    `json` TEXT DEFAULT NULL,
+     PRIMARY KEY (`id`),
+    INDEX(`gameName`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+    """
+        };
         DaoHelper.configureDatabase(createStatements);
     }
     public GameData createGame(String gameName) throws DataAccessException {
@@ -71,21 +82,22 @@ public class GameDaoSql implements GameDAO {
         return result;
     }
 
+
     public void clear() throws DataAccessException{
         var statement = "TRUNCATE game";
         executeUpdate(statement);
     }
+    public void updateGame(GameData game) throws DataAccessException{
+        String statement = "UPDATE game SET whiteusername = ?, blackusername=?," +
+                " gameName=?, json = ?, gameID = ?";
+        String json = new Gson().toJson(game);
+        try{
+            executeUpdate(statement, game.getWhiteUsername(), game.getBlackUsername(), game.getGameName(), json,game.getGameID());
+            }
+        catch(Exception ex){
+            throw new DataAccessException("Failed to update game data" , ex);
+        }
+    }
 
 
-    private final String[] createStatements={
-    """
-    CREATE TABLE IF NOT EXISTS game (
-    `id` INT NOT NULL,
-    `gameName` VARCHAR(256) NOT NULL,
-    `json` TEXT DEFAULT NULL,
-     PRIMARY KEY (`id`),
-    INDEX(`gameName`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
-    """
-    };
 }

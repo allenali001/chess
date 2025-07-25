@@ -1,8 +1,8 @@
 package service;
 
-import dataaccess.DAOs.AuthDAO;
-import dataaccess.MemoryClasses.AuthDaoMemory;
-import dataaccess.MemoryClasses.UserDaoMemory;
+import dataaccess.daos.AuthDAO;
+import dataaccess.memoryClasses.AuthDaoMemory;
+import dataaccess.memoryClasses.UserDaoMemory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.request.LoginRequest;
@@ -33,9 +33,7 @@ class UserServiceTest {
 
     @Test
     void registerException(){
-        Exception ex= assertThrows(Exception.class,()->{
-            userService.register(new RegisterRequest(null,null,"email"));
-        });
+        Exception ex= assertThrows(Exception.class,()-> userService.register(new RegisterRequest(null,null,"email")));
         System.out.println(ex.getMessage());
     }
 
@@ -53,9 +51,7 @@ class UserServiceTest {
 
     @Test
     void loginException(){
-        Exception ex= assertThrows(Exception.class,()->{
-            userService.login(new LoginRequest("username",null));
-        });
+        Exception ex= assertThrows(Exception.class,()-> userService.login(new LoginRequest("username",null)));
         System.out.println(ex.getMessage());
     }
 
@@ -75,9 +71,7 @@ class UserServiceTest {
 
      @Test
     void logoutException(){
-         Exception ex= assertThrows(Exception.class,()->{
-            userService.logout("invalid");
-        });
+         Exception ex= assertThrows(Exception.class,()-> userService.logout("invalid"));
          System.out.println(ex.getMessage());
      }
  }

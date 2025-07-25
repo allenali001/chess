@@ -1,7 +1,7 @@
 package service;
 
-import dataaccess.DAOs.AuthDAO;
-import dataaccess.MemoryClasses.AuthDaoMemory;
+import dataaccess.daos.AuthDAO;
+import dataaccess.memoryClasses.AuthDaoMemory;
 import models.AuthData;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -27,9 +27,7 @@ class AuthServiceTest {
 
     @Test
     void valAuthTokenException() {
-        Exception ex= assertThrows(Exception.class, () -> {
-            authService.valAuthToken("authtok");
-        });
+        Exception ex= assertThrows(Exception.class, () -> authService.valAuthToken("authtok"));
         System.out.println(ex.getMessage());
     }
 }

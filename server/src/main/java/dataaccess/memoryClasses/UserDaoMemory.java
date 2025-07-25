@@ -1,5 +1,5 @@
-package dataaccess.MemoryClasses;
-import dataaccess.DAOs.UserDAO;
+package dataaccess.memoryClasses;
+import dataaccess.daos.UserDAO;
 import dataaccess.DataAccessException;
 import models.UserData;
 

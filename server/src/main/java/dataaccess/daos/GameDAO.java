@@ -1,4 +1,4 @@
-package dataaccess.DAOs;
+package dataaccess.daos;
 
 import dataaccess.DataAccessException;
 import models.GameData;
@@ -10,4 +10,5 @@ public interface GameDAO {
     GameData getGame(int gameID) throws DataAccessException;
     void clear() throws DataAccessException;
     List<GameData> listGames() throws DataAccessException;
+    void updateGame(GameData game) throws DataAccessException;
 }

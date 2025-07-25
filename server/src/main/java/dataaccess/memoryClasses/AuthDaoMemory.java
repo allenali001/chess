@@ -1,5 +1,5 @@
-package dataaccess.MemoryClasses;
-import dataaccess.DAOs.AuthDAO;
+package dataaccess.memoryClasses;
+import dataaccess.daos.AuthDAO;
 import dataaccess.DataAccessException;
 import models.AuthData;
 import service.exceptions.IncorrectAuthTokenException;
@@ -34,7 +34,12 @@ public class AuthDaoMemory implements AuthDAO {
         }
     }
     public void clear() throws DataAccessException {
-        authdatlist.clear();
+        try{
+            authdatlist.clear();
+        }catch (Exception ex){
+            throw new DataAccessException("Could not clear", ex);
+        }
+
     }
 
     public void deleteAuth(String tok) throws IncorrectAuthTokenException, DataAccessException {

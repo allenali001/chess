@@ -1,4 +1,4 @@
-package dataaccess.DAOs;
+package dataaccess.daos;
 
 import dataaccess.DataAccessException;
 import models.UserData;

@@ -1,10 +1,8 @@
 package server;
 
-
-import dataaccess.DAOs.AuthDAO;
-import dataaccess.MemoryClasses.AuthDaoMemory;
-import dataaccess.MemoryClasses.GameDaoMemory;
-import dataaccess.MemoryClasses.UserDaoMemory;
+import dataaccess.memoryClasses.AuthDaoMemory;
+import dataaccess.memoryClasses.GameDaoMemory;
+import dataaccess.memoryClasses.UserDaoMemory;
 import server.handler.*;
 import service.AuthService;
 import service.ClearService;
@@ -12,30 +10,37 @@ import service.GameService;
 import service.UserService;
 import spark.*;
 
-import static spark.Spark.*;
 
 public class Server {
+    private UserService userService;
+    private GameService gameService;
+    private ClearService clearService;
 
-    public int run(int desiredPort) {
+    public Server() {
+        this.userService = new UserService(new UserDaoMemory(), new AuthDaoMemory());
+        this.gameService = new GameService(new GameDaoMemory(), new AuthService(new AuthDaoMemory()));
+        this.clearService = new ClearService(new UserDaoMemory(), new AuthDaoMemory(), new GameDaoMemory());
+    }
+
+    public Server(UserService userService, GameService gameService, ClearService clearService){
+        this.userService = userService;
+        this.gameService = gameService;
+        this.clearService= clearService;
+    }
+
+    public int run(int desiredPort){
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
-        UserDaoMemory userDaoMemory = new UserDaoMemory();
-        AuthDAO authDAO = new AuthDaoMemory();
-        GameDaoMemory gameDaoMemory = new GameDaoMemory();
-        UserService userService=new UserService(userDaoMemory, authDAO);
-        ClearService clearService = new ClearService(userDaoMemory,authDAO, gameDaoMemory);
-        AuthService authService = new AuthService(authDAO);
-        GameService gameService = new GameService(gameDaoMemory, authService);
 
         // Register your endpoints and handle exceptions here.
-        post("/user", new RegisterHandler(userService));
-        post("/session", new LoginHandler(userService));
-        delete("/session", new LogOutHandler(userService));
-        get("/game", new ListGameHandler(gameService));
-        post("/game", new CreateGameHandler(gameService));
-        put("/game", new JoinGameHandler(gameService));
-        delete("/db", new ClearHandler(clearService));
+        Spark.post("/user",new RegisterHandler(userService));
+        Spark.post("/session", new LoginHandler(userService));
+        Spark.delete("/session", new LogOutHandler(userService));
+        Spark.get("/game", new ListGameHandler(gameService));
+        Spark.post("/game", new CreateGameHandler(gameService));
+        Spark.put("/game", new JoinGameHandler(gameService));
+        Spark.delete("/db", new ClearHandler(clearService));
 
 
         Spark.awaitInitialization();

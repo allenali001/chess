@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.daos.GameDAO;
 import dataaccess.DataAccessException;
 import models.AuthData;
 import models.GameData;
@@ -10,16 +11,16 @@ import server.result.CreateGameResult;
 import server.result.JoinGameResult;
 import server.result.ListGameResult;
 import service.exceptions.*;
-import dataaccess.MemoryClasses.GameDaoMemory;
+
 
 import java.util.List;
 
 public class GameService {
-    private final GameDaoMemory gameDaoMemory;
+    private final GameDAO gameDAO;
     private final AuthService authService;
 
-    public GameService(GameDaoMemory gameDaoMemory, AuthService authService) {
-        this.gameDaoMemory = gameDaoMemory;
+    public GameService(GameDAO gameDao, AuthService authService) {
+        this.gameDAO = gameDao;
         this.authService = authService;
     }
     public CreateGameResult createGame(String authToken, CreateGameRequest request)
@@ -29,15 +30,15 @@ public class GameService {
         if (request == null || request.gameName() == null || request.gameName().isBlank()) {
             throw new MissingParameterException("Error: Missing a parameter");
         }
-        GameData game = gameDaoMemory.createGame(request.gameName());
+        GameData game = gameDAO.createGame(request.gameName());
         return new CreateGameResult(game.getGameID(), null);
     }
-    public void joinGame(JoinGameRequest joinGameRequest)
+    public JoinGameResult joinGame(JoinGameRequest joinGameRequest)
             throws DataAccessException, IncorrectAuthTokenException,
             AlreadyTakenException, NoGameException, Forbidden {
         AuthData authData = authService.valAuthToken(joinGameRequest.authToken());
         String username = authData.getUsername();
-        GameData game = gameDaoMemory.getGame(joinGameRequest.gameID());
+        GameData game = gameDAO.getGame(joinGameRequest.gameID());
         if (game == null) {
             throw new NoGameException("Error: No game with this GameID exists");
         }
@@ -61,12 +62,13 @@ public class GameService {
                         ("Error: This color is already taken by another player");
             }
         }
-        new JoinGameResult(null);
+        gameDAO.updateGame(game);
+        return new JoinGameResult(null);
     }
    public ListGameResult listGame(ListGameRequest listGamerRequest) throws IncorrectAuthTokenException, DataAccessException {
         authService.valAuthToken(listGamerRequest.authToken());
         List<GameData> games;
-        games = gameDaoMemory.listGames();
+        games = gameDAO.listGames();
         return new ListGameResult(games,null);
     }
 }

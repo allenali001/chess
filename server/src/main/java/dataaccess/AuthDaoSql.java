@@ -1,7 +1,7 @@
 package dataaccess;
 
 import com.google.gson.Gson;
-import dataaccess.DAOs.AuthDAO;
+import dataaccess.daos.AuthDAO;
 import models.AuthData;
 
 import java.sql.ResultSet;

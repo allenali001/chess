@@ -1,5 +1,5 @@
-package dataaccess.MemoryClasses;
-import dataaccess.DAOs.GameDAO;
+package dataaccess.memoryClasses;
+import dataaccess.daos.GameDAO;
 import dataaccess.DataAccessException;
 import models.GameData;
 
@@ -52,5 +52,17 @@ public class GameDaoMemory implements GameDAO {
             throw new DataAccessException("List game data could not be accessed", Ex);
         }
     }
-
+    @Override
+    public void updateGame(GameData game) throws DataAccessException {
+        try {
+            for (int i = 0; i < gameDataList.size(); i++) {
+                if (gameDataList.get(i).getGameID() == game.getGameID()) {
+                    gameDataList.set(i, game);
+                    return;
+                }
+            }
+        } catch (Exception ex) {
+            throw new DataAccessException("Update game data could not be accessed", ex);
+        }
+    }
 }

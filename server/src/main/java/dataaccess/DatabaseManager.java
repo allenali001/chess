@@ -29,7 +29,6 @@ public class DatabaseManager {
             throw new RuntimeException("unable to process db.properties. " + ex.getMessage());
         }
     }
-    // ^from example code :)
 
     /**
      * Creates the database if it does not already exist.

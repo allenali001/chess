@@ -1,10 +1,10 @@
 package service;
 
 import dataaccess.*;
-import dataaccess.DAOs.AuthDAO;
-import dataaccess.MemoryClasses.AuthDaoMemory;
-import dataaccess.MemoryClasses.GameDaoMemory;
-import dataaccess.MemoryClasses.UserDaoMemory;
+import dataaccess.daos.AuthDAO;
+import dataaccess.memoryClasses.AuthDaoMemory;
+import dataaccess.memoryClasses.GameDaoMemory;
+import dataaccess.memoryClasses.UserDaoMemory;
 import models.AuthData;
 import models.UserData;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,9 +44,7 @@ class GameServiceTest {
 
     @Test
     void createGameException() {
-        Exception ex= assertThrows(Exception.class, () -> {
-            gameService.createGame(authTok, new CreateGameRequest(null));
-        });
+        Exception ex= assertThrows(Exception.class, () -> gameService.createGame(authTok, new CreateGameRequest(null)));
         System.out.println(ex.getMessage());
     }
     @Test
@@ -79,9 +77,7 @@ class GameServiceTest {
 
     @Test
     void listGameException() {
-        Exception ex= assertThrows(Exception.class, () -> {
-            gameService.listGame(new ListGameRequest("invalid"));
-        });
+        Exception ex= assertThrows(Exception.class, () -> gameService.listGame(new ListGameRequest("invalid")));
         System.out.println(ex.getMessage());
     }
 }
