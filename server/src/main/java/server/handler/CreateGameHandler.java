@@ -31,7 +31,8 @@ public class CreateGameHandler implements Route {
         }catch (MissingParameterException ex){
             result = toJson(res,400, new CreateGameResult(null, ex.getMessage()));
         }catch (DataAccessException ex){
-            result=toJson(res, 500, new CreateGameResult(null, ex.getMessage()));
+            res.status(500);
+            result=toJson(res, 500, new CreateGameResult(null,"Error" + ex.getMessage()));
         }
         return result;
     }

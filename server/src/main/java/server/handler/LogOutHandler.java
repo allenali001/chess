@@ -25,8 +25,9 @@ public class LogOutHandler implements Route {
             result = toJson(res, 200, new LogoutResult(null));
         } catch (IncorrectAuthTokenException Ex) {
             result = toJson(res, 401, new LogoutResult(Ex.getMessage()));
-        }catch(DataAccessException Ex){
-            result = toJson(res, 500, new LogoutResult(Ex.getMessage()));
+        }catch(DataAccessException ex){
+            res.status(500);
+            result = toJson(res, 500, new LogoutResult("Error" + ex.getMessage()));
         }
         return result;
     }

@@ -29,8 +29,9 @@ public class RegisterHandler implements Route {
             result = toJson(res, 403, new RegisterResult(null, null, Ex.getMessage()));
         }catch (MissingParameterException Ex){
             result = toJson(res,400, new RegisterResult(null,null,Ex.getMessage()));
-        }catch (DataAccessException Ex){
-            result = toJson(res, 500, new RegisterResult(null,null, Ex.getMessage()));
+        }catch (DataAccessException ex){
+            res.status(500);
+            result = toJson(res, 500, new RegisterResult(null,null,"Error" + ex.getMessage()));
         }
         return result;
     }

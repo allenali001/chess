@@ -26,19 +26,20 @@ public class JoinGameHandler implements Route {
         Object result;
         try {
             String authToken = req.headers("Authorization");
-            JoinGameRequest joinGameRequest = fromJson(req, JoinGameRequest.class);
-            joinGameRequest = new JoinGameRequest(authToken, joinGameRequest.gameID(), joinGameRequest.playerColor());
-            gameService.joinGame(joinGameRequest);
+            JoinGameRequest inrequest = fromJson(req, JoinGameRequest.class);
+            JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, inrequest.gameID(), inrequest.playerColor());
+
             JoinGameResult serviceResult = gameService.joinGame(joinGameRequest);
             result = toJson(res, 200, serviceResult);
-        } catch (IncorrectAuthTokenException Ex) {
-            result = toJson(res, 401, new JoinGameResult(Ex.getMessage()));
-        } catch (AlreadyTakenException Ex) {
-            result = toJson(res, 403, new JoinGameResult(Ex.getMessage()));
-        }catch (Forbidden | NoGameException Ex){
-            result = toJson(res, 400, new JoinGameResult(Ex.getMessage()));
-         }catch (DataAccessException Ex){
-            result= toJson(res, 500, new JoinGameResult( Ex.getMessage()));
+        } catch (IncorrectAuthTokenException ex) {
+            result = toJson(res, 401, new JoinGameResult(ex.getMessage()));
+        } catch (AlreadyTakenException ex) {
+            result = toJson(res, 403, new JoinGameResult(ex.getMessage()));
+        }catch (Forbidden | NoGameException ex){
+            result = toJson(res, 400, new JoinGameResult(ex.getMessage()));
+         }catch (DataAccessException ex){
+            res.status(500);
+            result= toJson(res, 500, new JoinGameResult("Error" + ex.getMessage()));
          }
         return result;
     }

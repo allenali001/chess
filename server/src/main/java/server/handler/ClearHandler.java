@@ -1,5 +1,6 @@
 package server.handler;
 
+import dataaccess.DataAccessException;
 import server.result.ClearResult;
 import service.ClearService;
 import service.exceptions.FailureToClearException;
@@ -20,8 +21,9 @@ public class ClearHandler implements Route {
         try {
             clearService.clear();
             return toJson(res, 200, new Object());
-        } catch (FailureToClearException Ex) {
-            result = toJson(res, 500, new ClearResult(Ex.getMessage()));
+        } catch (FailureToClearException  | DataAccessException ex) {
+            res.status(500);
+            result = toJson(res, 500, new ClearResult("Error" + ex.getMessage()));
         }
         return result;
     }

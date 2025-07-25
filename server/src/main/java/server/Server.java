@@ -1,8 +1,6 @@
 package server;
 
-import dataaccess.memoryClasses.AuthDaoMemory;
-import dataaccess.memoryClasses.GameDaoMemory;
-import dataaccess.memoryClasses.UserDaoMemory;
+import dataaccess.*;
 import server.handler.*;
 import service.AuthService;
 import service.ClearService;
@@ -12,20 +10,32 @@ import spark.*;
 
 
 public class Server {
-    private UserService userService;
-    private GameService gameService;
-    private ClearService clearService;
+    private final UserService userService;
+    private final GameService gameService;
+    private final ClearService clearService;
 
-    public Server() {
-        this.userService = new UserService(new UserDaoMemory(), new AuthDaoMemory());
-        this.gameService = new GameService(new GameDaoMemory(), new AuthService(new AuthDaoMemory()));
-        this.clearService = new ClearService(new UserDaoMemory(), new AuthDaoMemory(), new GameDaoMemory());
-    }
 
     public Server(UserService userService, GameService gameService, ClearService clearService){
         this.userService = userService;
         this.gameService = gameService;
         this.clearService= clearService;
+    }
+    public Server() {
+        try {
+            var userDAO = new UserDaoSql();
+            var authDAO = new AuthDaoSql();
+            var gameDAO = new GameDaoSql();
+
+            this.userService = new UserService(userDAO, authDAO);
+            this.gameService = new GameService(gameDAO, new AuthService(authDAO));
+            this.clearService = new ClearService(userDAO, authDAO, gameDAO);
+        } catch (DataAccessException ex) {
+            try {
+                throw new DataAccessException("Error: could not access server");
+            } catch (DataAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public int run(int desiredPort){

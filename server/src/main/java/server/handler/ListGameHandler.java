@@ -26,8 +26,9 @@ public class ListGameHandler implements Route {
             result = toJson(res, 200, listGameResult);
         } catch (IncorrectAuthTokenException Ex) {
             result = toJson(res, 401, new ListGameResult(null, Ex.getMessage()));
-        } catch (DataAccessException Ex) {
-            result = toJson(res, 500, new ListGameResult(null, Ex.getMessage()));
+        } catch (DataAccessException ex) {
+            res.status(500);
+            result = toJson(res, 500, new ListGameResult(null, "Error" + ex.getMessage()));
         }
         return result;
     }
