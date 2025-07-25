@@ -1,8 +1,8 @@
 package service;
 
-import dataaccess.daos.AuthDAO;
-import dataaccess.memoryClasses.AuthDaoMemory;
-import dataaccess.memoryClasses.UserDaoMemory;
+import dataaccess.AuthDAO;
+import dataaccess.AuthDaoMemory;
+import dataaccess.UserDaoMemory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.request.LoginRequest;

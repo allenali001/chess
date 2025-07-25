@@ -37,7 +37,7 @@ public class GameService {
             throws DataAccessException, IncorrectAuthTokenException,
             AlreadyTakenException, NoGameException, Forbidden {
         AuthData authData = authService.valAuthToken(joinGameRequest.authToken());
-        String username = authData.getUsername();
+        String username = authData.username();
         GameData game = gameDAO.getGame(joinGameRequest.gameID());
         if (game == null) {
             throw new NoGameException("Error: No game with this GameID exists");

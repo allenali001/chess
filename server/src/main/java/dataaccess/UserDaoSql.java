@@ -31,7 +31,7 @@ public class UserDaoSql implements UserDAO {
     public void createUser(UserData u) throws DataAccessException {
         String statement = "INSERT INTO `user` (username, email, json, password) VALUES (?, ?, ?, ?)";
         String json = new Gson().toJson(u);
-        int rows = executeUpdate(statement, u.getUsername(), u.getEmail(), json, u.getPassword());
+        int rows = executeUpdate(statement, u.username(), u.email(), json, u.password());
         if (rows != 1) {
             throw new DataAccessException("Error: Failed to insert user, affected rows: " + rows);
         }

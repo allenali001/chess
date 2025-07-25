@@ -26,8 +26,8 @@ public class JoinGameHandler implements Route {
         Object result;
         try {
             String authToken = req.headers("Authorization");
-            JoinGameRequest inrequest = fromJson(req, JoinGameRequest.class);
-            JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, inrequest.gameID(), inrequest.playerColor());
+            JoinGameRequest inRequest = fromJson(req, JoinGameRequest.class);
+            JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, inRequest.gameID(), inRequest.playerColor());
 
             JoinGameResult serviceResult = gameService.joinGame(joinGameRequest);
             result = toJson(res, 200, serviceResult);

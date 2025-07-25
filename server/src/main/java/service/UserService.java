@@ -36,8 +36,8 @@ public class UserService {
         UserData userdata = new UserData(registerRequest.username(), registerRequest.email(),hashedPassword);
         userDAO.createUser(userdata);
         AuthData auth;
-        auth = authDAO.createAuth(userdata.getUsername());
-        return new RegisterResult(userdata.getUsername(), auth.getAuthToken(), null);
+        auth = authDAO.createAuth(userdata.username());
+        return new RegisterResult(userdata.username(), auth.authToken(), null);
     }
 
 
@@ -55,12 +55,12 @@ public class UserService {
         if (username1 == null) {
             throw new NoSuchUserException("Error: Username does not exist");
         }
-        if (!BCrypt.checkpw(loginRequest.password(), username1.getPassword())) {
+        if (!BCrypt.checkpw(loginRequest.password(), username1.password())) {
             throw new WrongPassWordException("Error: Incorrect Password");
         }
             AuthData authData;
-        authData = authDAO.createAuth(username1.getUsername());
-        return new LoginResult(username1.getUsername(), authData.getAuthToken(), null);
+        authData = authDAO.createAuth(username1.username());
+        return new LoginResult(username1.username(), authData.authToken(), null);
     }
     public void logout(String authToken) throws
             IncorrectAuthTokenException, DataAccessException {

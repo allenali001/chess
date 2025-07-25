@@ -1,10 +1,6 @@
 package service;
 
 import dataaccess.*;
-import dataaccess.daos.AuthDAO;
-import dataaccess.memoryClasses.AuthDaoMemory;
-import dataaccess.memoryClasses.GameDaoMemory;
-import dataaccess.memoryClasses.UserDaoMemory;
 import models.AuthData;
 import models.UserData;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +26,7 @@ class GameServiceTest {
         gameService = new GameService(gameDaoMemory, authService);
         userDaoMemory.createUser(new UserData("username","password","email"));
         AuthData authData = authDAO.createAuth("username");
-        authTok=authData.getAuthToken();
+        authTok=authData.authToken();
     }
 
     @Test

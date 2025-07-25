@@ -1,7 +1,7 @@
 package service;
 
-import dataaccess.daos.AuthDAO;
-import dataaccess.memoryClasses.AuthDaoMemory;
+import dataaccess.AuthDAO;
+import dataaccess.AuthDaoMemory;
 import models.AuthData;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,10 +19,10 @@ class AuthServiceTest {
     @Test
     void valAuthTokenPositive() throws Exception{
         AuthData user = authDAO.createAuth("username");
-        AuthData res = authService.valAuthToken(user.getAuthToken());
+        AuthData res = authService.valAuthToken(user.authToken());
         System.out.println(res);
         assertNotNull(res);
-        assertEquals("username", res.getUsername());
+        assertEquals("username", res.username());
     }
 
     @Test

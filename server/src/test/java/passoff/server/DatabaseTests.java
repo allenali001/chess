@@ -7,9 +7,14 @@ import server.Server;
 
 import java.lang.reflect.Method;
 import java.sql.*;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DatabaseTests {
@@ -59,7 +64,7 @@ public class DatabaseTests {
         //join the game
         serverFacade.joinPlayer(new TestJoinRequest(ChessGame.TeamColor.WHITE, createResult.getGameID()), auth);
 
-        Assertions.assertTrue(initialRowCount < getDatabaseRows(), "No new data added to database");
+        assertTrue(initialRowCount < getDatabaseRows(), "No new data added to database");
 
         // Test that we can read the data after a restart
         stopServer();
@@ -67,18 +72,18 @@ public class DatabaseTests {
 
         //list games using the auth
         TestListResult listResult = serverFacade.listGames(auth);
-        Assertions.assertEquals(200, serverFacade.getStatusCode(), "Server response code was not 200 OK");
-        Assertions.assertEquals(1, listResult.getGames().length, "Missing game(s) in database after restart");
+        assertEquals(200, serverFacade.getStatusCode(), "Server response code was not 200 OK");
+        assertEquals(1, listResult.getGames().length, "Missing game(s) in database after restart");
 
         TestListEntry game1 = listResult.getGames()[0];
-        Assertions.assertEquals(game1.getGameID(), createResult.getGameID());
-        Assertions.assertEquals(gameName, game1.getGameName(), "Game name changed after restart");
-        Assertions.assertEquals(TEST_USER.getUsername(), game1.getWhiteUsername(),
+        assertEquals(game1.getGameID(), createResult.getGameID());
+        assertEquals(gameName, game1.getGameName(), "Game name changed after restart");
+        assertEquals(TEST_USER.getUsername(), game1.getWhiteUsername(),
                 "White player username changed after restart");
 
         //test that we can still log in
         serverFacade.login(TEST_USER);
-        Assertions.assertEquals(200, serverFacade.getStatusCode(), "Unable to login");
+        assertEquals(200, serverFacade.getStatusCode(), "Unable to login");
     }
 
     @Test
@@ -126,10 +131,10 @@ public class DatabaseTests {
         try {
             for (Supplier<TestResult> operation : operations) {
                 TestResult result = operation.get();
-                Assertions.assertEquals(500, serverFacade.getStatusCode(),
+                assertEquals(500, serverFacade.getStatusCode(),
                         "Server response code was not 500 Internal Error");
-                Assertions.assertNotNull(result.getMessage(), "Invalid Request didn't return an error message");
-                Assertions.assertTrue(result.getMessage().toLowerCase(Locale.ROOT).contains("error"),
+                assertNotNull(result.getMessage(), "Invalid Request didn't return an error message");
+                assertTrue(result.getMessage().toLowerCase(Locale.ROOT).contains("error"),
                         "Error message didn't contain the word \"Error\"");
             }
         } finally {
@@ -163,7 +168,7 @@ public class DatabaseTests {
             while (rs.next()) {
                 for (int i = 1; i <= columns; i++) {
                     String value = rs.getString(i);
-                    Assertions.assertFalse(value.contains(TEST_USER.getPassword()),
+                    assertFalse(value.contains(TEST_USER.getPassword()),
                             "Found clear text password in database");
                 }
             }
@@ -184,7 +189,7 @@ public class DatabaseTests {
                 }
             }
         } catch (ReflectiveOperationException | SQLException e) {
-            Assertions.fail(e.getMessage(), e);
+            fail(e.getMessage(), e);
         }
     }
 

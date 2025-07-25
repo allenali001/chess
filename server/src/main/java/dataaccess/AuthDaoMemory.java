@@ -22,7 +22,7 @@ public class AuthDaoMemory implements AuthDAO {
     public AuthData getAuth(String tok) throws DataAccessException {
         try {
             for (AuthData atok : authdatlist) {
-                if (tok.equals(atok.getAuthToken())) {
+                if (tok.equals(atok.authToken())) {
                     return atok;
                 }
             }

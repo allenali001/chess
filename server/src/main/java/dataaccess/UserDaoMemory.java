@@ -12,7 +12,7 @@ public class UserDaoMemory implements UserDAO {
         try {
             if (username != null) {
                 for (UserData u : userslist) {
-                    if (u.getUsername().equals(username)) {
+                    if (u.username().equals(username)) {
                         return u;
                     }
                 }
