@@ -1,7 +1,7 @@
 package service;
 
-import dataaccess.daos.AuthDAO;
-import dataaccess.daos.UserDAO;
+import dataaccess.AuthDAO;
+import dataaccess.UserDAO;
 import dataaccess.DataAccessException;
 import models.AuthData;
 import models.UserData;
@@ -19,6 +19,7 @@ public class UserService {
         this.userDAO = userDAO;
         this.authDAO=authDAO;
     }
+
     public RegisterResult register(RegisterRequest registerRequest)throws
             AlreadyTakenException, MissingParameterException , DataAccessException {
         if (userDAO.getUser(registerRequest.username()) != null) {
@@ -32,7 +33,7 @@ public class UserService {
             throw new MissingParameterException("Error: Missing a parameter");
         }
         String hashedPassword = BCrypt.hashpw(registerRequest.password(), BCrypt.gensalt());
-        UserData userdata = new UserData(registerRequest.username(), hashedPassword, registerRequest.email());
+        UserData userdata = new UserData(registerRequest.username(), registerRequest.email(),hashedPassword);
         userDAO.createUser(userdata);
         AuthData auth;
         auth = authDAO.createAuth(userdata.getUsername());

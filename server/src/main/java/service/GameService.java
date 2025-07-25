@@ -1,6 +1,6 @@
 package service;
 
-import dataaccess.daos.GameDAO;
+import dataaccess.GameDAO;
 import dataaccess.DataAccessException;
 import models.AuthData;
 import models.GameData;

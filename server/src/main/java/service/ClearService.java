@@ -1,8 +1,9 @@
 package service;
 
-import dataaccess.daos.AuthDAO;
-import dataaccess.daos.GameDAO;
-import dataaccess.daos.UserDAO;
+import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
+import dataaccess.GameDAO;
+import dataaccess.UserDAO;
 import service.exceptions.FailureToClearException;
 
 public class ClearService {
@@ -16,7 +17,7 @@ public class ClearService {
         this.gameDAO = gameDAO;
     }
 
-    public void clear() throws FailureToClearException {
+    public void clear() throws FailureToClearException , DataAccessException {
         try {
             userDAO.clear();
             authDAO.clear();
