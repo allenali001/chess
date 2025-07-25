@@ -1,7 +1,6 @@
 package dataaccess;
 
 import com.google.gson.Gson;
-import dataaccess.daos.AuthDAO;
 import models.AuthData;
 
 import java.sql.ResultSet;
@@ -17,10 +16,10 @@ public class AuthDaoSql implements AuthDAO {
     }
 
     public AuthData createAuth(String username) throws DataAccessException {
-        var statement = "INSERT INTO auth (token, username,json) VALUES(?, ?,?)";
         var token = UUID.randomUUID().toString();
         var auth = new AuthData(username, token);
         var json = new Gson().toJson(auth);
+        var statement = "INSERT INTO auth (token, username,json) VALUES(?, ?,?)";
         executeUpdate(statement, token, username, json);
         return auth;
     }
@@ -37,7 +36,7 @@ public class AuthDaoSql implements AuthDAO {
                 }
             }
         } catch (SQLException ex) {
-            throw new DataAccessException(String.format("Unable to read data: %s",
+            throw new DataAccessException(String.format("Error: Unable to read data: %s",
                     ex.getMessage()));
         }
         return null;

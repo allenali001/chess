@@ -1,6 +1,4 @@
-package dataaccess.memoryClasses;
-import dataaccess.daos.GameDAO;
-import dataaccess.DataAccessException;
+package dataaccess;
 import models.GameData;
 
 import java.util.ArrayList;

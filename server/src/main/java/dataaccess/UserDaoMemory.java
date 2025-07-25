@@ -1,6 +1,4 @@
-package dataaccess.memoryClasses;
-import dataaccess.daos.UserDAO;
-import dataaccess.DataAccessException;
+package dataaccess;
 import models.UserData;
 
 import java.util.ArrayList;
