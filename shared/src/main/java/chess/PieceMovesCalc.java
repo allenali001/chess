@@ -8,22 +8,14 @@ public class PieceMovesCalc {
     public Collection<ChessMove> calculateMoves(ChessBoard board,
                                                 ChessPosition
             position, ChessPiece piece) {
-        switch (piece.getPieceType()) {
-            case KING:
-                return calcKingMoves(board, position, piece);
-            case QUEEN:
-                return calcQueenMoves(board, position, piece);
-            case PAWN:
-                return calcPawnMoves(board, position, piece);
-            case ROOK:
-                return calcRookMoves(board, position, piece);
-            case BISHOP:
-                return calcBishopMoves(board, position, piece);
-            case KNIGHT:
-                return calcKnightMoves(board, position, piece);
-            default:
-                return new ArrayList<>();
-        }
+        return switch (piece.getPieceType()) {
+            case KING -> calcKingMoves(board, position, piece);
+            case QUEEN -> calcQueenMoves(board, position, piece);
+            case PAWN -> calcPawnMoves(board, position, piece);
+            case ROOK -> calcRookMoves(board, position, piece);
+            case BISHOP -> calcBishopMoves(board, position, piece);
+            case KNIGHT -> calcKnightMoves(board, position, piece);
+        };
     }
 
     private Collection<ChessMove> calcKingMoves(ChessBoard board,

@@ -175,6 +175,7 @@ public class ChessGame {
                 if (piece != null && piece.getTeamColor() != teamColor) {
                     Collection<ChessMove> moves = piece.pieceMoves(board, newPos);
                     for (ChessMove mov : moves) {
+                        assert king != null;
                         int kingRow = king.getRow();
                         int kingCol = king.getColumn();
                         ChessPosition kinglocation = new ChessPosition(kingRow, kingCol);
