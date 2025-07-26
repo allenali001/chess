@@ -11,7 +11,7 @@ import static dataaccess.DaoHelper.executeUpdate;
 public class AuthDaoSql implements AuthDAO {
 
     public AuthDaoSql() throws DataAccessException {
-        DaoHelper.configureDatabase(createStatements);
+        DaoHelper.configureDatabase(CreateStatements);
 
     }
 
@@ -57,7 +57,7 @@ public class AuthDaoSql implements AuthDAO {
         executeUpdate(statement);
     }
 
-    private static final String[] createStatements = {
+    private static final String[] CreateStatements = {
             """
             CREATE TABLE IF NOT EXISTS  auth (
               `token` VARCHAR(256) NOT NULL,

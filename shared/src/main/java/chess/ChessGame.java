@@ -199,12 +199,16 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        int row;
-        int col;
-        row = 1;
         if (!isInCheck(teamColor)) {
             return false;
         }
+        return moveChecker(teamColor);
+    }
+
+    private boolean moveChecker(TeamColor teamColor){
+        int row;
+        int col;
+        row = 1;
         while (row <= 8) {
             col = 1;
             while (col <= 8) {
@@ -223,6 +227,7 @@ public class ChessGame {
         return true;
     }
 
+
     /**
      * Determines if the given team is in stalemate, which here is defined as having
      * no valid moves while not in check.
@@ -237,22 +242,7 @@ public class ChessGame {
         if (isInCheck(teamColor)) {
             return false;
         }
-        while (row <= 8) {
-            col = 1;
-            while (col <= 8) {
-                ChessPosition newPos = new ChessPosition(row, col);
-                ChessPiece piece = board.getPiece(newPos);
-                if (piece != null && piece.getTeamColor() == teamColor) {
-                    Collection<ChessMove> moves = validMoves(newPos);
-                    if (moves != null && !moves.isEmpty()) {
-                        return false;
-                    }
-                }
-                col+=1;
-            }
-            row+=1;
-        }
-        return true;
+        return moveChecker(teamColor);
     }
     /**
      * Sets this game's chessboard with a given board

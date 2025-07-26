@@ -14,9 +14,9 @@ import static java.sql.Types.NULL;
 
 public class GameDaoSql implements GameDAO {
     public GameDaoSql() throws DataAccessException {
-        configureDatabase(createStatements);
+        configureDatabase(CreateStatements);
     }
-    private static final String[] createStatements = {
+    private static final String[] CreateStatements = {
             """
     CREATE TABLE IF NOT EXISTS game (
     `id` INT AUTO_INCREMENT NOT NULL,
@@ -49,8 +49,8 @@ public class GameDaoSql implements GameDAO {
     }
         GameData newGame = new GameData(gameID, null, null, gameName, null);
              String json = new Gson().toJson(newGame);
-             String N = "UPDATE game SET json = ? WHERE id = ?";
-             executeUpdate(N,json,gameID);
+             String n = "UPDATE game SET json = ? WHERE id = ?";
+             executeUpdate(n,json,gameID);
              return newGame;
     }
     public GameData getGame(int gameID) throws DataAccessException {
