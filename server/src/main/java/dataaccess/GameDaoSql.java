@@ -31,12 +31,27 @@ public class GameDaoSql implements GameDAO {
     };
 
     public GameData createGame(String gameName) throws DataAccessException {
-        GameData newGame = new GameData(0, null, null, gameName, null);
-        var statement = "INSERT INTO game(gameName, json) VALUES (? , ? )";
-        var json = new Gson().toJson(newGame);
-        int gameID = executeUpdate(statement, gameName, json);
-        newGame.setID(gameID);
-        return newGame;
+        String insert = "INSERT INTO game(gameName) VALUES (?)";
+        int gameID;
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement(insert, RETURN_GENERATED_KEYS)){
+             ps.setString(1,gameName);
+             ps.executeUpdate();
+             try(var rs = ps.getGeneratedKeys()) {
+                 if (rs.next()) {
+                     gameID = rs.getInt(1);
+                 } else {
+                     throw new DataAccessException("Error: no game id");
+                 }
+             }
+        }catch (SQLException ex){
+                 throw new DataAccessException("Error: can't create game");
+    }
+        GameData newGame = new GameData(gameID, null, null, gameName, null);
+             String json = new Gson().toJson(newGame);
+             String N = "UPDATE game SET json = ? WHERE id = ?";
+             executeUpdate(N,json,gameID);
+             return newGame;
     }
     public GameData getGame(int gameID) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
@@ -56,9 +71,16 @@ public class GameDaoSql implements GameDAO {
     }
     private GameData readGame(ResultSet rs) throws SQLException {
         var json = rs.getString("json");
-        var game = new Gson().fromJson(json, GameData.class);
-        game.setID(rs.getInt("id"));
-        return game;
+        if (json == null || json.isBlank()) {
+            return null;
+        }
+        try {
+            var game = new Gson().fromJson(json, GameData.class);
+            game.setID(rs.getInt("id"));
+            return game;
+        } catch (Exception ex) {
+            throw new SQLException("Error: Failure" + json, ex);
+        }
     }
 
     public List<GameData> listGames() throws DataAccessException {

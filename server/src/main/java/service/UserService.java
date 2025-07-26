@@ -64,6 +64,11 @@ public class UserService {
     }
     public void logout(String authToken) throws
             IncorrectAuthTokenException, DataAccessException {
+        var auth = authDAO.getAuth(authToken);
+        if(auth==null){
+            throw new IncorrectAuthTokenException("Error: invalid auth token");
+        }
         authDAO.deleteAuth(authToken);
+
     }
 }
