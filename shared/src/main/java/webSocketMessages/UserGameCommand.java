@@ -12,6 +12,13 @@ public record UserGameCommand(Type type, String authToken, Integer gameID, Strin
         RESIGN
     }
 
+    public String getAuthToken(){
+        return authToken;
+    }
+    public int getGameID(){
+        return gameID;
+    }
+
     public String toString() {
         return new Gson().toJson(this);
     }
