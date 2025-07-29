@@ -6,10 +6,10 @@ import dataaccess.DataAccessException;
 import models.AuthData;
 import models.UserData;
 import org.mindrot.jbcrypt.BCrypt;
-import server.request.LoginRequest;
-import server.request.RegisterRequest;
-import server.result.LoginResult;
-import server.result.RegisterResult;
+import request.LoginRequest;
+import request.RegisterRequest;
+import result.LoginResult;
+import result.RegisterResult;
 import service.exceptions.*;
 
 public class UserService {

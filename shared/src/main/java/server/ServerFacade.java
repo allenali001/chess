@@ -2,8 +2,9 @@ package server;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
-import server.request.*;
-import server.result.*;
+import request.*;
+import result.*;
+
 import java.io.*;
 import java.net.*;
 

@@ -1,7 +1,7 @@
 package server.handler;
 
 import dataaccess.DataAccessException;
-import server.result.ClearResult;
+import result.ClearResult;
 import service.ClearService;
 import service.exceptions.FailureToClearException;
 import spark.Request;

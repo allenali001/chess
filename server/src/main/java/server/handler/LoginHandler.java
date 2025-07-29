@@ -1,12 +1,12 @@
 package server.handler;
 import dataaccess.DataAccessException;
-import server.request.LoginRequest;
+import request.LoginRequest;
 import service.exceptions.MissingParameterException;
 import spark.Request;
 import spark.Response;
 import service.UserService;
 import spark.Route;
-import server.result.LoginResult;
+import result.LoginResult;
 import service.exceptions.WrongPassWordException;
 import service.exceptions.NoSuchUserException;
 import static server.helper.JsonHelper.fromJson;

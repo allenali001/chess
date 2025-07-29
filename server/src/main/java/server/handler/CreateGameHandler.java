@@ -1,8 +1,8 @@
 package server.handler;
 
 import dataaccess.DataAccessException;
-import server.request.CreateGameRequest;
-import server.result.CreateGameResult;
+import request.CreateGameRequest;
+import result.CreateGameResult;
 import service.GameService;
 import service.exceptions.IncorrectAuthTokenException;
 import service.exceptions.MissingParameterException;

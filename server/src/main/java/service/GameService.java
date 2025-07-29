@@ -4,12 +4,12 @@ import dataaccess.GameDAO;
 import dataaccess.DataAccessException;
 import models.AuthData;
 import models.GameData;
-import server.request.CreateGameRequest;
-import server.request.JoinGameRequest;
-import server.request.ListGameRequest;
-import server.result.CreateGameResult;
-import server.result.JoinGameResult;
-import server.result.ListGameResult;
+import request.CreateGameRequest;
+import request.JoinGameRequest;
+import request.ListGameRequest;
+import result.CreateGameResult;
+import result.JoinGameResult;
+import result.ListGameResult;
 import service.exceptions.*;
 
 

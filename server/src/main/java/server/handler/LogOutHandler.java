@@ -1,7 +1,7 @@
 package server.handler;
 
 import dataaccess.DataAccessException;
-import server.result.LogoutResult;
+import result.LogoutResult;
 import service.UserService;
 import service.exceptions.IncorrectAuthTokenException;
 import spark.Request;

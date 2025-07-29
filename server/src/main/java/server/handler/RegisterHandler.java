@@ -1,8 +1,8 @@
 package server.handler;
 
 import dataaccess.DataAccessException;
-import server.request.RegisterRequest;
-import server.result.RegisterResult;
+import request.RegisterRequest;
+import result.RegisterResult;
 import service.UserService;
 import service.exceptions.AlreadyTakenException;
 import service.exceptions.MissingParameterException;

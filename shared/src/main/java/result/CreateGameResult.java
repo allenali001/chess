@@ -1,4 +1,4 @@
-package server.result;
+package result;
 
 public record CreateGameResult (Integer gameID, String message){
 }

@@ -1,8 +1,8 @@
 package server.handler;
 
 import dataaccess.DataAccessException;
-import server.request.ListGameRequest;
-import server.result.ListGameResult;
+import request.ListGameRequest;
+import result.ListGameResult;
 import service.GameService;
 import service.exceptions.IncorrectAuthTokenException;
 import spark.Request;

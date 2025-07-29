@@ -5,11 +5,11 @@ import models.AuthData;
 import models.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import server.request.CreateGameRequest;
-import server.request.JoinGameRequest;
-import server.request.ListGameRequest;
-import server.result.CreateGameResult;
-import server.result.ListGameResult;
+import request.CreateGameRequest;
+import request.JoinGameRequest;
+import request.ListGameRequest;
+import result.CreateGameResult;
+import result.ListGameResult;
 
 import static org.junit.jupiter.api.Assertions.*;
 class GameServiceTest {

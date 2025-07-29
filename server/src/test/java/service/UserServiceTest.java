@@ -5,10 +5,10 @@ import dataaccess.AuthDaoMemory;
 import dataaccess.UserDaoMemory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import server.request.LoginRequest;
-import server.request.RegisterRequest;
-import server.result.LoginResult;
-import server.result.RegisterResult;
+import request.LoginRequest;
+import request.RegisterRequest;
+import result.LoginResult;
+import result.RegisterResult;
 
 import static org.junit.jupiter.api.Assertions.*;
 class UserServiceTest {

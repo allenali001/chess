@@ -1,8 +1,8 @@
 package server.handler;
 
 import dataaccess.DataAccessException;
-import server.request.JoinGameRequest;
-import server.result.JoinGameResult;
+import request.JoinGameRequest;
+import result.JoinGameResult;
 import service.GameService;
 import service.exceptions.AlreadyTakenException;
 import service.exceptions.Forbidden;
