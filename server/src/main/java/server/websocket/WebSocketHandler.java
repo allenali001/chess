@@ -14,7 +14,6 @@ import webSocketMessages.UserGameCommand;
 import webSocketMessages.ServerMessage;
 import java.io.IOException;
 import models.AuthData;
-import dataaccess.AuthDAO;
 import service.exceptions.*;
 
 @WebSocket
