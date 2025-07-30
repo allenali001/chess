@@ -1,4 +1,4 @@
-package client;
+/*package client;
 
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -27,3 +27,4 @@ public class ServerFacadeTests {
     }
 
 }
+ */

@@ -8,22 +8,21 @@ import service.ClearService;
 import service.GameService;
 import service.UserService;
 import spark.*;
-import dataaccess.GameDAO;
 
 
 public class Server {
     private final UserService userService;
     private final GameService gameService;
     private final ClearService clearService;
-    private final WebSocketHandler webSocketHandler;
+    private WebSocketHandler webSocketHandler;
 
 
 
-    public Server(UserService userService, GameService gameService, ClearService clearService){
+    public Server(UserService userService, GameService gameService, ClearService clearService, WebSocketHandler webSocketHandler){
         this.userService = userService;
         this.gameService = gameService;
         this.clearService= clearService;
-        webSocketHandler = new WebSocketHandler();
+        this.webSocketHandler = webSocketHandler;
     }
     public Server() {
         try {
@@ -34,6 +33,7 @@ public class Server {
             this.userService = new UserService(userDAO, authDAO);
             this.gameService = new GameService(gameDAO, new AuthService(authDAO));
             this.clearService = new ClearService(userDAO, authDAO, gameDAO);
+            this.webSocketHandler = new WebSocketHandler(gameDAO,authDAO);
         } catch (DataAccessException ex) {
             try {
                 throw new DataAccessException("Error: could not access server");

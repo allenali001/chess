@@ -2,15 +2,19 @@ package server;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
+import models.GameData;
 import request.*;
 import result.*;
 
 import java.io.*;
 import java.net.*;
+import java.util.List;
 
 public class ServerFacade {
 
     private final String serverUrl;
+    private List<GameData> cachedGames;
+    private String authToken;
 
     public ServerFacade(String url) {
         serverUrl = url;
@@ -18,12 +22,16 @@ public class ServerFacade {
 
     public RegisterResult register(RegisterRequest request) throws ResponseException {
         var path = "/user";
-        return this.makeRequest("POST", path, request, RegisterResult.class);
+        RegisterResult result = this.makeRequest("POST", path, request, RegisterResult.class);
+        this.authToken = result.authToken();
+        return result;
     }
 
     public LoginResult login(LoginRequest request) throws ResponseException {
         var path = "/session";
-        return this.makeRequest("POST", path, request, LoginResult.class);
+        LoginResult result = this.makeRequest("POST", path, request, LoginResult.class);
+        this.authToken=result.authToken();
+        return result;
     }
 
     public LogoutResult logout(String authToken) throws ResponseException {
@@ -39,11 +47,22 @@ public class ServerFacade {
 
     public JoinGameResult joinGame(JoinGameRequest request) throws ResponseException {
         var path = "/game";
-        return this.makeRequest("PUT", path, request, JoinGameResult.class);
+        return this.makeRequest("PUT", path, request, JoinGameResult.class, this.authToken);
     }
-    public CreateGameRequest createGame(CreateGameRequest request) throws ResponseException{
+    public CreateGameResult createGame(CreateGameRequest request) throws ResponseException{
         var path = "/game";
-        return this.makeRequest("POST",path,request,CreateGameRequest.class);
+        return this.makeRequest("POST",path,request,CreateGameResult.class, this.authToken);
+
+    }
+    public GameData getGame(int gameID) throws ResponseException{
+        if (cachedGames!=null){
+        for (GameData game: cachedGames) {
+            if (game.getGameID() == gameID) {
+                return game;
+            }
+        }
+        }
+        throw new ResponseException(400, "GameID not found");
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
@@ -124,5 +143,9 @@ public class ServerFacade {
 
     private boolean isSuccessful(int status) {
         return status / 100 == 2;
+    }
+
+    public void setCachedGames(List<GameData> cachedGames) {
+        this.cachedGames = cachedGames;
     }
 }

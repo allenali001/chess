@@ -38,7 +38,7 @@ public class PreLoginRepl implements NotificationHandler {
                     }
                     case "login" -> doLogin(params);
                     case "register" -> doRegister(params);
-                    default -> System.out.println(help());
+                    case "help" -> System.out.println(help());
 
                 }
             } catch (Exception ex){
@@ -50,7 +50,7 @@ public class PreLoginRepl implements NotificationHandler {
 
 
     private void doLogin(String[] params) throws ResponseException {
-        if (params.length >= 3) {
+        if (params.length >= 2) {
             var username = params[0];
             var password = params[1];
             var result = server.login(new LoginRequest(username, password));
@@ -61,7 +61,7 @@ public class PreLoginRepl implements NotificationHandler {
         }
     }
     private void doRegister(String[] params) throws ResponseException {
-        if (params.length >= 4) {
+        if (params.length >= 3) {
             var username = params[0];
             var password = params[1];
             var email = params[2];

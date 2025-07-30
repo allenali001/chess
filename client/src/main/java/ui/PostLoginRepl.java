@@ -46,7 +46,7 @@ public class PostLoginRepl implements NotificationHandler {
                     case "creategame" -> doCreateGame(params);
                     case "listgames" -> doListGames();
                     case "joingame" -> doJoinGame(params);
-                    default -> System.out.println(help());
+                    case "help" -> System.out.println(help());
                 }
             } catch (Exception ex) {
                 System.out.println("Error: " + ex.getMessage());
@@ -54,7 +54,7 @@ public class PostLoginRepl implements NotificationHandler {
         }
     }
     private void doCreateGame(String[] params) throws ResponseException{
-        if (params.length >=2){
+        if (params.length >=1){
             String gameName = params[0];
             var result = server.createGame(new CreateGameRequest(gameName));
             System.out.println("Game created. Game name: " + gameName + ", GameID: " + result.gameID());
@@ -63,7 +63,11 @@ public class PostLoginRepl implements NotificationHandler {
         }
     }
     private void doJoinGame(String[] params) throws ResponseException{
-        if (params.length >=3){
+        if (gameMap.isEmpty()){
+            System.out.println("Run 'listgames' first");
+            return;
+        }
+        if (params.length >=2){
             int gameNumber;
             gameNumber = Integer.parseInt(params[0]);
             String color = params[1].toLowerCase();
@@ -102,8 +106,10 @@ public class PostLoginRepl implements NotificationHandler {
     public String help() {
 
         return """
-                - login <username> <password>
-                - register <username> <password> <email>
+                - logout,
+                - creategame <gameName>,
+                - listgames, 
+                - joingame <gameID> <playercolor>,
                 - quit
                 """;
     }

@@ -1,5 +1,6 @@
 import dataaccess.*;
 import server.Server;
+import server.websocket.WebSocketHandler;
 import service.AuthService;
 import service.ClearService;
 import service.GameService;
@@ -26,7 +27,7 @@ public class Main {
                 var gameService = new GameService(gameDAO, authService);
                 var userService = new UserService(userDAO, authDAO);
 
-                port = new Server(userService, gameService, clearService).run(port);
+                port = new Server(userService, gameService, clearService, new WebSocketHandler(gameDAO,authDAO)).run(port);
                 System.out.printf("Server started on port %d with UserDAO: %s, GameDAO: %s, AuthDAO: %s%n", port,
                         userDAO.getClass().getSimpleName(),
                         gameDAO.getClass().getSimpleName(),
