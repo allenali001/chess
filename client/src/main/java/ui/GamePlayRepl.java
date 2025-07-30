@@ -30,7 +30,7 @@ public class GamePlayRepl {
     }
 
     private void drawHeaders() {
-        setBlack(out);
+        out.print(SET_TEXT_COLOR_WHITE);
         out.print("   ");
         for (int col = 0; col < BOARD_SIZE_IN_SQUARES; ++col) {
             int displayCol = isBlackPerspective ? (BOARD_SIZE_IN_SQUARES - 1 - col) : col;
@@ -60,21 +60,15 @@ public class GamePlayRepl {
 
     private void drawSquare(PrintStream out, String piece, boolean isLight) {
         out.print(isLight ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_BLACK);
-
         if (piece.equals(EMPTY)) {
             out.print("   ");
-        } else if (Character.isUpperCase(piece.trim().charAt(0))) {
+        } else if (Character.isUpperCase(piece.charAt(0))) {
             out.print(SET_TEXT_COLOR_RED + piece);
-        } else {
+        } else if (Character.isLowerCase(piece.charAt(0))){
             out.print(SET_TEXT_COLOR_BLUE + piece);
         }
-        setBlack(out);
     }
 
-    private static void setBlack(PrintStream out) {
-        out.print(SET_BG_COLOR_BLACK);
-        out.print(SET_TEXT_COLOR_BLACK);
-    }
     private static final String[][] INITIAL_BOARD = {
             {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK},
             {BLACK_PAWN, BLACK_PAWN,   BLACK_PAWN,   BLACK_PAWN,  BLACK_PAWN,  BLACK_PAWN,   BLACK_PAWN,   BLACK_PAWN},

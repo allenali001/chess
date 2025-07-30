@@ -20,11 +20,13 @@ public class PostLoginRepl implements NotificationHandler {
     private final ReplHelper helper = new ReplHelper();
 
     private final Map<Integer, GameData> gameMap = new HashMap<>();
-    public PostLoginRepl(ChessClient client, ServerFacade server, String authToken, String username){
-        this.client=client;
-        this.server= server;
-        this.authToken=authToken;
+
+    public PostLoginRepl(ChessClient client, ServerFacade server, String authToken, String username) {
+        this.client = client;
+        this.server = server;
+        this.authToken = authToken;
     }
+
     public void run() {
         System.out.println("You are now logged in. Type 'help'.");
         Scanner scanner = new Scanner(System.in);
@@ -45,7 +47,8 @@ public class PostLoginRepl implements NotificationHandler {
                     }
                     case "creategame" -> doCreateGame(params);
                     case "listgames" -> doListGames();
-                    case "joingame" -> doJoinGame(params);
+                    case "playgame" -> doPlayGame(params);
+                    case "observegame" -> doObserveGame(params);
                     case "help" -> System.out.println(help());
                 }
             } catch (Exception ex) {
@@ -53,26 +56,28 @@ public class PostLoginRepl implements NotificationHandler {
             }
         }
     }
-    private void doCreateGame(String[] params) throws ResponseException{
-        if (params.length >=1){
+
+    private void doCreateGame(String[] params) throws ResponseException {
+        if (params.length >= 1) {
             String gameName = params[0];
             var result = server.createGame(new CreateGameRequest(gameName));
             System.out.println("Game created. Game name: " + gameName + ", GameID: " + result.gameID());
-        }else{
+        } else {
             System.out.println("GameName required");
         }
     }
-    private void doJoinGame(String[] params) throws ResponseException{
-        if (gameMap.isEmpty()){
+
+    private void doPlayGame(String[] params) throws ResponseException {
+        if (gameMap.isEmpty()) {
             System.out.println("Run 'listgames' first");
             return;
         }
-        if (params.length >=2){
+        if (params.length >= 2) {
             int gameNumber;
             gameNumber = Integer.parseInt(params[0]);
             String color = params[1].toLowerCase();
-            if (!color.equals("white") && !color.equals("black") && !color.equals("observe")){
-                System.out.println("Must enter a valid color: White, Black, or Observe");
+            if (!color.equals("white") && !color.equals("black")) {
+                System.out.println("Must enter a valid color: White or Black");
                 return;
             }
             var game = gameMap.get(gameNumber);
@@ -80,16 +85,24 @@ public class PostLoginRepl implements NotificationHandler {
                 System.out.println("Invalid Game number entered");
                 return;
             }
-            String playerColor = color.equals("observe")? null: color;
+            String playerColor = color.equals("observe") ? null : color;
             server.joinGame(new JoinGameRequest(authToken, game.getGameID(), playerColor));
-            if (color.equals("observe")){
-                System.out.println("Observing game: "+game.getGameName());
-                client.transitionToGameplay(game.getGameID(), "observer");
-
-            }else{
-                System.out.println("Joined game as "+color +":" +game.getGameName());
-                client.transitionToGameplay(game.getGameID(), color);
-            }
+            System.out.println("Playing game as " + color + ":" + game.getGameName());
+            client.transitionToGameplay(game.getGameID(), color);
+        }
+    }
+    public void doObserveGame(String[] params) throws ResponseException{
+        if (gameMap.isEmpty()){
+            System.out.println("Run 'listgames' first");
+            return;
+        }
+        if (params.length >=1){
+            int gameNumber = Integer.parseInt(params[0]);
+            var game = gameMap.get(gameNumber);
+            System.out.print("Observing game: "+ game.getGameName());
+            client.transitionToGameplay(game.getGameID(),"OBSERVER");
+        }else{
+            System.out.println("GameNumber required");
         }
     }
     public void doListGames() throws ResponseException{
@@ -109,7 +122,8 @@ public class PostLoginRepl implements NotificationHandler {
                 - logout,
                 - creategame <gameName>,
                 - listgames, 
-                - joingame <gameID> <playercolor>,
+                - playgame <gameID> <playercolor>,
+                - observegame <gameID>
                 - quit
                 """;
     }

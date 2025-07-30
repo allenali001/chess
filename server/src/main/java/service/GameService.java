@@ -44,17 +44,16 @@ public class GameService {
         }
         String color;
         color = joinGameRequest.playerColor();
-        if (!"WHITE".equals(color) && !"BLACK".equals(color)) {
+        if (!"WHITE".equalsIgnoreCase(color) && !"BLACK".equalsIgnoreCase(color)) {
             throw new Forbidden("Error: Invalid Color Entered");
-
         }
-        if (color.equals("WHITE")) {
+        if ("white".equalsIgnoreCase(color)) {
             if (game.getWhiteUsername() == null) {
                 game.setWhiteUsername(username);
             } else {
                 throw new AlreadyTakenException("Error: This color is already taken by another player");
             }
-        } else {
+        } else if ("black".equalsIgnoreCase(color)){
             if (game.getBlackUsername() == null) {
                 game.setBlackUsername(username);
             } else {
