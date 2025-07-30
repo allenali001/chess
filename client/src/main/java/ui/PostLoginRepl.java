@@ -89,7 +89,7 @@ public class PostLoginRepl implements NotificationHandler {
             }
             String playerColor = color.equals("observe") ? null : color;
             server.joinGame(new JoinGameRequest(authToken, game.getGameID(), playerColor));
-            System.out.println("Playing game as " + color + ":" + game.getGameName());
+            System.out.println("Playing game as " + color + ":" + game.getGameName() + "\n");
             client.transitionToGameplay(game.getGameID(), color);
         }
     }
@@ -101,7 +101,7 @@ public class PostLoginRepl implements NotificationHandler {
         if (params.length >=1){
             int gameNumber = Integer.parseInt(params[0]);
             var game = gameMap.get(gameNumber);
-            System.out.print("Observing game: "+ game.getGameName());
+            System.out.print("Observing game: "+ game.getGameName() + "\n");
             client.transitionToGameplay(game.getGameID(),"OBSERVER");
         }else{
             System.out.println("GameNumber required");
