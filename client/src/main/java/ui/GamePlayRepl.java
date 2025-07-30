@@ -44,36 +44,39 @@ public class GamePlayRepl {
     private void drawBoard() {
         for (int i = 0; i < BOARD_SIZE_IN_SQUARES; ++i) {
             int visualRow = isBlackPerspective ? i : (BOARD_SIZE_IN_SQUARES - 1 - i);
-            int actualRow = i;
-            int rowLabel = isBlackPerspective ? (i+1): (BOARD_SIZE_IN_SQUARES-i);
+            int rowLabel = isBlackPerspective ? (i + 1) : (BOARD_SIZE_IN_SQUARES - i);
             out.print(" " + rowLabel + " ");
-            drawRowOfSquares(actualRow,visualRow);
+            drawRowOfSquares(visualRow);
             out.print(RESET_BG_COLOR);
             out.print(RESET_TEXT_COLOR);
             out.print(" " + rowLabel);
             out.println();
         }
     }
-    private void drawRowOfSquares(int actualRow, int visualRow) {
-        for (int i = 0; i < BOARD_SIZE_IN_SQUARES; ++i) {
-            int visualCol = isBlackPerspective ? (BOARD_SIZE_IN_SQUARES - 1 - i) : i;
-            int actualCol = i;
+    private void drawRowOfSquares(int visualRow) {
+        boolean isBottomRow = (isBlackPerspective && visualRow == 0) || (!isBlackPerspective && visualRow == BOARD_SIZE_IN_SQUARES - 1);
 
-            boolean isLight = (visualRow + visualCol) % 2 == 1; // visual position controls square color
+        for (int visualCol = 0; visualCol < BOARD_SIZE_IN_SQUARES; ++visualCol) {
+            int whitePerspectiveRow = isBlackPerspective ? (BOARD_SIZE_IN_SQUARES - 1 - visualRow) : visualRow;
+            boolean isLight = (whitePerspectiveRow + visualCol) % 2 == 1;
+
+            int actualRow = isBlackPerspective ? (BOARD_SIZE_IN_SQUARES - 1 - visualRow) : visualRow;
+            int actualCol = isBlackPerspective ? (BOARD_SIZE_IN_SQUARES - 1 - visualCol) : visualCol;
+
             String piece = INITIAL_BOARD[actualRow][actualCol];
-            drawSquare(out, piece, isLight);
+            drawSquare(out, piece, isLight, isBottomRow);
         }
     }
-
-    private void drawSquare(PrintStream out, String piece, boolean isLight) {
+    private void drawSquare(PrintStream out, String piece, boolean isLight, boolean isBottomRow) {
         out.print(isLight ? SET_BG_COLOR_WHITE : SET_BG_COLOR_BLACK);
+
         if (piece.equals(EMPTY)) {
             out.print("   ");
         } else {
-            String color =switch(piece){
-                case WHITE_PAWN, WHITE_BISHOP, WHITE_KNIGHT, WHITE_KING, WHITE_ROOK, WHITE_QUEEN -> SET_TEXT_COLOR_RED;
-                default -> SET_TEXT_COLOR_BLUE;
-            };
+            boolean isWhitePiece = Character.isUpperCase(piece.charAt(1));
+            String color = isWhitePiece
+                    ? (isBlackPerspective ? SET_TEXT_COLOR_BLUE : SET_TEXT_COLOR_RED)
+                    : (isBlackPerspective ? SET_TEXT_COLOR_RED : SET_TEXT_COLOR_BLUE);
             out.print(color + piece);
         }
         resetColor();
