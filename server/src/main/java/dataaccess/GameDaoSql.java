@@ -116,7 +116,7 @@ public class GameDaoSql implements GameDAO {
             throw new DataAccessException("Error: Failed to update game data", ex);
         }
     }
-    public int executeUpdate(String statement, Object... params) throws
+    public void executeUpdate(String statement, Object... params) throws
             DataAccessException {
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
@@ -130,7 +130,7 @@ public class GameDaoSql implements GameDAO {
                     }
                 }
             }
-            return ps.executeUpdate();
+            ps.executeUpdate();
         } catch (SQLException ex) {
             throw new DataAccessException(String.format(
                     "unable to update database: %s, %s", statement, ex.getMessage()));

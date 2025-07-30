@@ -41,7 +41,10 @@ public class ServerFacade {
         var path = "/game";
         return this.makeRequest("PUT", path, request, JoinGameResult.class);
     }
-
+    public CreateGameRequest createGame(CreateGameRequest request) throws ResponseException{
+        var path = "/game";
+        return this.makeRequest("POST",path,request,CreateGameRequest.class);
+    }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
         try {
