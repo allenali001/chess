@@ -18,15 +18,15 @@ public class GamePlayRepl {
         this.out=new PrintStream(System.out, true, StandardCharsets.UTF_8);
         this.gameID=gameID;
         this.role=role;
-        this.isBlackPerspective=role.equalsIgnoreCase("BLACK");
+        this.isBlackPerspective="BLACK".equalsIgnoreCase(role);
     }
 
     public void run() {
         out.print(ERASE_SCREEN);
         drawHeaders();
         drawBoard();
-        out.print(SET_BG_COLOR_BLACK);
-        out.print(SET_TEXT_COLOR_WHITE);
+        out.print(RESET_BG_COLOR);
+        out.print(RESET_TEXT_COLOR);
     }
 
     private void drawHeaders() {
@@ -45,6 +45,8 @@ public class GamePlayRepl {
             int displayRow = isBlackPerspective ? row : (BOARD_SIZE_IN_SQUARES - 1 - row);
             out.print(" " + (displayRow + 1) + " ");
             drawRowOfSquares(displayRow);
+            out.print(RESET_BG_COLOR);
+            out.print(RESET_TEXT_COLOR);
             out.print(" " + (displayRow + 1));
             out.println();
         }
@@ -59,14 +61,21 @@ public class GamePlayRepl {
     }
 
     private void drawSquare(PrintStream out, String piece, boolean isLight) {
-        out.print(isLight ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_BLACK);
+        out.print(isLight ? SET_BG_COLOR_WHITE : SET_BG_COLOR_BLACK);
         if (piece.equals(EMPTY)) {
             out.print("   ");
-        } else if (Character.isUpperCase(piece.charAt(0))) {
-            out.print(SET_TEXT_COLOR_RED + piece);
-        } else if (Character.isLowerCase(piece.charAt(0))){
-            out.print(SET_TEXT_COLOR_BLUE + piece);
+        } else {
+            String color =switch(piece){
+                case WHITE_PAWN, WHITE_BISHOP, WHITE_KNIGHT, WHITE_KING, WHITE_ROOK, WHITE_QUEEN -> SET_TEXT_COLOR_RED;
+                default -> SET_TEXT_COLOR_BLUE;
+            };
+            out.print(color + piece);
         }
+        resetColor();
+    }
+    private void resetColor(){
+        out.print(RESET_BG_COLOR);
+        out.print(RESET_TEXT_COLOR);
     }
 
     private static final String[][] INITIAL_BOARD = {

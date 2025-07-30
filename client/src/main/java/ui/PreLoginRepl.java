@@ -39,7 +39,8 @@ public class PreLoginRepl implements NotificationHandler {
                     case "login" -> doLogin(params);
                     case "register" -> doRegister(params);
                     case "help" -> System.out.println(help());
-
+                    default -> System.out.print("Command not recognized. " +
+                            "Check spelling and try again, or type 'help' for options.");
                 }
             } catch (Exception ex){
                 System.out.println("Error: "+ex.getMessage());

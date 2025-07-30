@@ -50,6 +50,8 @@ public class PostLoginRepl implements NotificationHandler {
                     case "playgame" -> doPlayGame(params);
                     case "observegame" -> doObserveGame(params);
                     case "help" -> System.out.println(help());
+                    default -> System.out.print("Command not recognized. " +
+                            "Check spelling and try again, or type 'help' for options.");
                 }
             } catch (Exception ex) {
                 System.out.println("Error: " + ex.getMessage());
@@ -121,7 +123,7 @@ public class PostLoginRepl implements NotificationHandler {
         return """
                 - logout,
                 - creategame <gameName>,
-                - listgames, 
+                - listgames,
                 - playgame <gameID> <playercolor>,
                 - observegame <gameID>
                 - quit
