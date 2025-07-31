@@ -30,8 +30,4 @@ public class ResponseException extends Exception {
       return new ResponseException(400, "Malformed error response");
     }
   }
-
-  public int statusCode() {
-    return statusCode;
-  }
 }

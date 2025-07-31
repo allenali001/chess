@@ -138,10 +138,10 @@ public class GameDaoSql implements GameDAO {
         }
     }
 
-    public static void configureDatabase(String[] CREATE_STATEMENTS) throws DataAccessException {
+    public static void configureDatabase(String[] createStatements) throws DataAccessException {
         DatabaseManager.createDatabase();
         try (var conn = DatabaseManager.getConnection()) {
-            for (var statement : CREATE_STATEMENTS) {
+            for (var statement : createStatements) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
                 }
