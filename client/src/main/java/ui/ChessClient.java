@@ -23,4 +23,3 @@ public class ChessClient {
         return server;
     }
 }
-//testing from C:\

@@ -1,3 +1,3 @@
 package request;
 
-public record RegisterRequest(String username, String email, String password) { }
+public record RegisterRequest(String username, String password, String email) { }

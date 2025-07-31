@@ -16,7 +16,6 @@ public class PostLoginRepl implements NotificationHandler {
     private final ChessClient client;
     private final ServerFacade server;
     private final String authToken;
-    private final ReplHelper helper = new ReplHelper();
 
     private final Map<Integer, GameData> gameMap = new HashMap<>();
 
@@ -27,10 +26,10 @@ public class PostLoginRepl implements NotificationHandler {
     }
 
     public void run() {
-        System.out.println("You are now logged in. Type 'help'.");
+        System.out.println("Type 'help' for options.");
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            helper.printPrompt();
+            printPrompt();
             String input = scanner.nextLine().trim();
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
@@ -38,17 +37,20 @@ public class PostLoginRepl implements NotificationHandler {
             try {
                 switch (cmd) {
                     case "logout" -> {
-
                         server.logout(authToken);
                         System.out.println("You have been logged out");
                         client.transitionToPrelogin();
                         return;
                     }
-                    case "creategame" -> doCreateGame(params);
-                    case "listgames" -> doListGames();
-                    case "playgame" -> doPlayGame(params);
-                    case "observegame" -> doObserveGame(params);
+                    case "create" -> doCreateGame(params);
+                    case "list" -> doListGames();
+                    case "join" -> doPlayGame(params);
+                    case "observe"-> doObserveGame(params);
                     case "help" -> System.out.println(help());
+                    case "quit"-> {
+                        System.out.println("Quit game");
+                        return;
+                    }
                     default -> System.out.print("Command not recognized. " +
                             "Check spelling and try again, or type 'help' for options.");
                 }
@@ -70,7 +72,7 @@ public class PostLoginRepl implements NotificationHandler {
 
     private void doPlayGame(String[] params) throws ResponseException {
         if (gameMap.isEmpty()) {
-            System.out.println("Run 'listgames' first");
+            System.out.println("Run 'list' first");
             return;
         }
         if (params.length >= 2) {
@@ -94,7 +96,7 @@ public class PostLoginRepl implements NotificationHandler {
     }
     public void doObserveGame(String[] params) throws ResponseException{
         if (gameMap.isEmpty()){
-            System.out.println("Run 'listgames' first");
+            System.out.println("Run 'list' first");
             return;
         }
         if (params.length >=1){
@@ -122,20 +124,23 @@ public class PostLoginRepl implements NotificationHandler {
     public String help() {
 
         return """
-                - logout,
-                - creategame <gameName>,
-                - listgames,
-                - playgame <gameID> <playercolor>,
-                - observegame <gameID>
-                - quit
+                - logout - goes back to login page
+                - create <NAME> - a game
+                - list - games
+                - join <ID> [WHITE][BLACK] - a game
+                - observe <ID> - a game
+                - quit - playing chess
+                - help - with possible commands
                 """;
     }
 
     @Override
     public void notify (ServerMessage notification){
         System.out.println(notification.message());
-        helper.printPrompt();
+        printPrompt();
     }
-
+    public void printPrompt(){
+        System.out.print("\n" + "[LOGGED_IN] >>> ");
+    }
 }
 
