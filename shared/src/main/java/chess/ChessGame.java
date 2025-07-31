@@ -168,11 +168,12 @@ public class ChessGame {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition newPos = new ChessPosition(row, col);
                 ChessPiece piece = board.getPiece(newPos);
-                if (piece != null && piece.getTeamColor() != teamColor) {
-                    for (ChessMove move : piece.pieceMoves(board, newPos)) {
-                        if (move.getEndPosition().equals(kingPosition)) {
-                            return true;
-                        }
+                if (piece == null && piece.getTeamColor() == teamColor) {
+                    continue;
+                }
+                for (ChessMove move : piece.pieceMoves(board, newPos)) {
+                    if (move.getEndPosition().equals(kingPosition)) {
+                        return true;
                     }
                 }
             }
