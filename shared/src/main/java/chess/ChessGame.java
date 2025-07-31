@@ -151,42 +151,29 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        ChessPosition king = null;
-        int col;
-        int row;
-        row = 1;
-        while (row <= 8 && king == null) {
-            col = 1;
-            while (col <= 8 && king == null) {
-                ChessPiece piece = board.getPiece(new ChessPosition(row, col));
+        ChessPosition kingPosition = null;
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition position = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(position);
                 if (piece != null && piece.getTeamColor() == teamColor && piece.getPieceType() == ChessPiece.PieceType.KING) {
-                    king = new ChessPosition(row, col);
+                    kingPosition = position;
                 }
-                col += 1;
             }
-            row += 1;
         }
-        row = 1;
-        while (row <= 8) {
-            col = 1;
-            while (col <= 8) {
+        if (kingPosition==null) return false;
+        for (int row=1;row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
                 ChessPosition newPos = new ChessPosition(row, col);
                 ChessPiece piece = board.getPiece(newPos);
                 if (piece != null && piece.getTeamColor() != teamColor) {
-                    Collection<ChessMove> moves = piece.pieceMoves(board, newPos);
-                    for (ChessMove mov : moves) {
-                        assert king != null;
-                        int kingRow = king.getRow();
-                        int kingCol = king.getColumn();
-                        ChessPosition kinglocation = new ChessPosition(kingRow, kingCol);
-                        if (Objects.equals(mov.getEndPosition(), kinglocation)) {
+                    for (ChessMove move : piece.pieceMoves(board, newPos)) {
+                        if (move.getEndPosition().equals(kingPosition)) {
                             return true;
                         }
                     }
                 }
-                col += 1;
             }
-            row += 1;
         }
         return false;
     }

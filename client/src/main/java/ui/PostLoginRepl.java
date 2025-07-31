@@ -113,7 +113,9 @@ public class PostLoginRepl implements NotificationHandler {
         int index = 1;
         for (var game:games){
             gameMap.put(index,game);
-            System.out.printf("%d. %s | White: %s | Black: %s%n", index++, game.getGameName(), game.getWhiteUsername()!=null?game.getWhiteUsername() : "-",
+            System.out.printf("%d. %s | White: %s | Black: %s%n",
+                    index++, game.getGameName(),
+                    game.getWhiteUsername()!=null?game.getWhiteUsername() : "-",
                     game.getBlackUsername()!=null ? game.getBlackUsername(): "-");
         }
     }
