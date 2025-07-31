@@ -1,6 +1,7 @@
 package ui;
 
 import static ui.EscapeSequences.*;
+
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 
@@ -11,7 +12,6 @@ public class GamePlayRepl {
     private final String role;
     private final boolean isBlackPerspective;
 
-    private static final String EMPTY = " ";
     private static final int BOARD_SIZE_IN_SQUARES = 8;
 
     public GamePlayRepl(Object client, int gameID, String role){
@@ -23,9 +23,7 @@ public class GamePlayRepl {
 
     public void run() {
         out.print(ERASE_SCREEN);
-        drawHeaders();
         drawBoard();
-        drawHeaders();
         out.print(RESET_BG_COLOR);
         out.print(RESET_TEXT_COLOR);
     }
@@ -33,59 +31,48 @@ public class GamePlayRepl {
     private void drawHeaders() {
         out.print(SET_TEXT_COLOR_WHITE);
         out.print("   ");
-        for (int i = 0; i < BOARD_SIZE_IN_SQUARES; ++i) {
-            int displayCol = isBlackPerspective ? (BOARD_SIZE_IN_SQUARES - 1 - i) : i;
-            char file = (char) ('a' + displayCol);
-            out.print(" " + file + " ");
+        for (int i = 0; i < BOARD_SIZE_IN_SQUARES; i++) {
+            char label = (char)('a'+(isBlackPerspective ? (BOARD_SIZE_IN_SQUARES-1-i):i));
+            out.print(SET_TEXT_COLOR_WHITE + " " + label + " ");
         }
         out.println();
     }
 
     private void drawBoard() {
-        for (int i = 0; i < BOARD_SIZE_IN_SQUARES; ++i) {
-            int visualRow = isBlackPerspective ? i : (BOARD_SIZE_IN_SQUARES - 1 - i);
-            int rowLabel = isBlackPerspective ? (i + 1) : (BOARD_SIZE_IN_SQUARES - i);
-            out.print(" " + rowLabel + " ");
-            drawRowOfSquares(visualRow);
-            out.print(RESET_BG_COLOR);
-            out.print(RESET_TEXT_COLOR);
-            out.print(" " + rowLabel);
-            out.println();
+        drawHeaders();
+        for (int row = 0; row < BOARD_SIZE_IN_SQUARES; row++) {
+            int boardRow = isBlackPerspective ? row : (BOARD_SIZE_IN_SQUARES - 1 - row);
+            int displayRowLabel = isBlackPerspective ? (row + 1) : (BOARD_SIZE_IN_SQUARES - row);
+            out.print(SET_TEXT_COLOR_WHITE + " " + displayRowLabel + " ");
+            for (int col = 0; col < BOARD_SIZE_IN_SQUARES; col++) {
+                int boardCol = isBlackPerspective ? (BOARD_SIZE_IN_SQUARES - 1 - col) : col;
+                boolean isLight = (row + col) % 2 == 0;
+                String bgColor = isLight ? SET_BG_COLOR_WHITE: SET_BG_COLOR_BLACK;
+                String piece = INITIAL_BOARD[boardRow][boardCol];
+                String coloredPiece = colorizePiece(row, piece);
+                out.print(bgColor + coloredPiece);
+            }
+            out.println(RESET_BG_COLOR + SET_TEXT_COLOR_WHITE + " " + displayRowLabel);
         }
+        drawHeaders();
     }
-    private void drawRowOfSquares(int visualRow) {
-        boolean isBottomRow = (isBlackPerspective && visualRow == 0) || (!isBlackPerspective && visualRow == BOARD_SIZE_IN_SQUARES - 1);
-
-        for (int visualCol = 0; visualCol < BOARD_SIZE_IN_SQUARES; ++visualCol) {
-            int whitePerspectiveRow = isBlackPerspective ? (BOARD_SIZE_IN_SQUARES - 1 - visualRow) : visualRow;
-            boolean isLight = (whitePerspectiveRow + visualCol) % 2 == 1;
-
-            int actualRow = isBlackPerspective ? (BOARD_SIZE_IN_SQUARES - 1 - visualRow) : visualRow;
-            int actualCol = isBlackPerspective ? (BOARD_SIZE_IN_SQUARES - 1 - visualCol) : visualCol;
-
-            String piece = INITIAL_BOARD[actualRow][actualCol];
-            drawSquare(out, piece, isLight, isBottomRow);
-        }
-    }
-    private void drawSquare(PrintStream out, String piece, boolean isLight, boolean isBottomRow) {
-        out.print(isLight ? SET_BG_COLOR_WHITE : SET_BG_COLOR_BLACK);
-
-        if (piece.equals(EMPTY)) {
-            out.print("   ");
+    private String colorizePiece(int rowInd, String piece) {
+        if (piece.equals(EMPTY)) return RESET_TEXT_COLOR + piece;
+        if (!isBlackPerspective) {
+            if (rowInd >= 6) {
+                return SET_TEXT_COLOR_RED + piece.toUpperCase();
+            } else if (rowInd <= 1) {
+                return SET_TEXT_COLOR_BLUE + piece.toLowerCase();
+            }
         } else {
-            boolean isWhitePiece = Character.isUpperCase(piece.charAt(1));
-            String color = isWhitePiece
-                    ? (isBlackPerspective ? SET_TEXT_COLOR_BLUE : SET_TEXT_COLOR_RED)
-                    : (isBlackPerspective ? SET_TEXT_COLOR_RED : SET_TEXT_COLOR_BLUE);
-            out.print(color + piece);
+            if (rowInd <= 1) {
+                return SET_TEXT_COLOR_RED + piece.toUpperCase();
+            } else if (rowInd >= 6) {
+                return SET_TEXT_COLOR_BLUE + piece.toLowerCase();
+            }
         }
-        resetColor();
+        return RESET_TEXT_COLOR + piece;
     }
-    private void resetColor(){
-        out.print(RESET_BG_COLOR);
-        out.print(RESET_TEXT_COLOR);
-    }
-
     private static final String[][] INITIAL_BOARD = {
             {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK},
             {BLACK_PAWN, BLACK_PAWN,   BLACK_PAWN,   BLACK_PAWN,  BLACK_PAWN,  BLACK_PAWN,   BLACK_PAWN,   BLACK_PAWN},
@@ -97,5 +84,3 @@ public class GamePlayRepl {
             {WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN, WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK}
     };
 }
-
-
