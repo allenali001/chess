@@ -9,14 +9,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+import static dataaccess.DaoHelper.configureDatabase;
+import static dataaccess.DaoHelper.executeUpdate;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
-import static java.sql.Types.NULL;
+
 
 
 public class GameDaoSql implements GameDAO {
     public GameDaoSql() throws DataAccessException {
         configureDatabase(CREATE_STATEMENTS);
     }
+
     private static final String[] CREATE_STATEMENTS = {
             """
     CREATE TABLE IF NOT EXISTS game (
@@ -35,25 +38,26 @@ public class GameDaoSql implements GameDAO {
         String insert = "INSERT INTO game(gameName) VALUES (?)";
         int gameID;
         try (var conn = DatabaseManager.getConnection();
-             var ps = conn.prepareStatement(insert, RETURN_GENERATED_KEYS)){
-             ps.setString(1,gameName);
-             ps.executeUpdate();
-             try(var rs = ps.getGeneratedKeys()) {
-                 if (rs.next()) {
-                     gameID = rs.getInt(1);
-                 } else {
-                     throw new DataAccessException("Error: no game id");
-                 }
-             }
-        }catch (SQLException ex){
-                 throw new DataAccessException("Error: can't create game");
-    }
+             var ps = conn.prepareStatement(insert, RETURN_GENERATED_KEYS)) {
+            ps.setString(1, gameName);
+            ps.executeUpdate();
+            try (var rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    gameID = rs.getInt(1);
+                } else {
+                    throw new DataAccessException("Error: no game id");
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Error: can't create game");
+        }
         GameData newGame = new GameData(gameID, null, null, gameName, null);
-             String json = new Gson().toJson(newGame);
-             String n = "UPDATE game SET json = ? WHERE id = ?";
-             executeUpdate(n,json,gameID);
-             return newGame;
+        String json = new Gson().toJson(newGame);
+        String n = "UPDATE game SET json = ? WHERE id = ?";
+        executeUpdate(n, json, gameID);
+        return newGame;
     }
+
     public GameData getGame(int gameID) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT id, json FROM game WHERE id = ?";
@@ -70,6 +74,7 @@ public class GameDaoSql implements GameDAO {
         }
         return null;
     }
+
     private GameData readGame(ResultSet rs) throws SQLException {
         var json = rs.getString("json");
         if (json == null || json.isBlank()) {
@@ -107,6 +112,7 @@ public class GameDaoSql implements GameDAO {
         var statement = "TRUNCATE game";
         executeUpdate(statement);
     }
+
     public void updateGame(GameData game) throws DataAccessException {
         String statement = "UPDATE game SET whiteUsername = ?, blackUsername=?," +
                 " gameName=?, json = ? WHERE id = ?";
@@ -115,40 +121,6 @@ public class GameDaoSql implements GameDAO {
             executeUpdate(statement, game.getWhiteUsername(), game.getBlackUsername(), game.getGameName(), json, game.getGameID());
         } catch (Exception ex) {
             throw new DataAccessException("Error: Failed to update game data", ex);
-        }
-    }
-    public void executeUpdate(String statement, Object... params) throws
-            DataAccessException {
-        try (var conn = DatabaseManager.getConnection();
-             var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-            for (int i = 0; i < params.length; i++) {
-                var param = params[i];
-                switch (param) {
-                    case String p -> ps.setString(i + 1, p);
-                    case Integer p -> ps.setInt(i + 1, p);
-                    case null -> ps.setNull(i + 1, NULL);
-                    default -> {
-                    }
-                }
-            }
-            ps.executeUpdate();
-        } catch (SQLException ex) {
-            throw new DataAccessException(String.format(
-                    "unable to update database: %s, %s", statement, ex.getMessage()));
-        }
-    }
-
-    public static void configureDatabase(String[] createStatements) throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) {
-            for (var statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DataAccessException(String.format(
-                    "Unable to configure database: %s", ex.getMessage()));
         }
     }
 }

@@ -7,7 +7,7 @@ import static java.sql.Types.NULL;
 
 public class DaoHelper {
 
-    public static void executeUpdate(String statement, Object... params) throws
+    public static int executeUpdate(String statement, Object... params) throws
             DataAccessException {
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
@@ -21,13 +21,12 @@ public class DaoHelper {
                     }
                 }
             }
-            ps.executeUpdate();
+            return ps.executeUpdate();
         } catch (SQLException ex) {
             throw new DataAccessException(String.format(
                     "unable to update database: %s, %s", statement, ex.getMessage()));
         }
     }
-
     public static void configureDatabase(String[] createStatements) throws DataAccessException {
         DatabaseManager.createDatabase();
         try (var conn = DatabaseManager.getConnection()) {
@@ -37,8 +36,7 @@ public class DaoHelper {
                 }
             }
         } catch (SQLException ex) {
-            throw new DataAccessException(String.format(
-                    "Unable to configure database: %s", ex.getMessage()));
+            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
         }
     }
 }

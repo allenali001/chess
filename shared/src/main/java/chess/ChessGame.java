@@ -161,7 +161,9 @@ public class ChessGame {
                 }
             }
         }
-        if (kingPosition==null) return false;
+        if (kingPosition==null) {
+            return false;
+        }
         for (int row=1;row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition newPos = new ChessPosition(row, col);

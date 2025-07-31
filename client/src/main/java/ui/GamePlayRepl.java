@@ -57,7 +57,9 @@ public class GamePlayRepl {
         drawHeaders();
     }
     private String colorizePiece(int rowInd, String piece) {
-        if (piece.equals(EMPTY)) return RESET_TEXT_COLOR + piece;
+        if (piece.equals(EMPTY)){
+            return RESET_TEXT_COLOR + piece;
+        }
         if (!isBlackPerspective) {
             if (rowInd >= 6) {
                 return SET_TEXT_COLOR_RED + piece.toUpperCase();
