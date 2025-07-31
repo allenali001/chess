@@ -1,4 +1,4 @@
-package webSocketMessages;
+package websocketmesssages;
 
 import chess.ChessGame;
 import com.google.gson.Gson;

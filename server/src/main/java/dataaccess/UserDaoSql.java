@@ -11,9 +11,9 @@ import static java.sql.Types.NULL;
 public class UserDaoSql implements UserDAO {
 
     public UserDaoSql() throws DataAccessException {
-        configureDatabase(createStatements);
+        configureDatabase(CREATE_STATEMENTS);
     }
-        private static final String[] createStatements = {
+        private static final String[] CREATE_STATEMENTS = {
                 """
     CREATE TABLE IF NOT EXISTS `user` (
         username VARCHAR(256) NOT NULL,
@@ -76,10 +76,10 @@ public class UserDaoSql implements UserDAO {
         }
     }
 
-    public static void configureDatabase(String[] createStatements) throws DataAccessException {
+    public static void configureDatabase(String[] CREATE_STATEMENTS) throws DataAccessException {
         DatabaseManager.createDatabase();
         try (var conn = DatabaseManager.getConnection()) {
-            for (var statement : createStatements) {
+            for (var statement : CREATE_STATEMENTS) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
                 }

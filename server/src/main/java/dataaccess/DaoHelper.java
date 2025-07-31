@@ -28,10 +28,10 @@ public class DaoHelper {
         }
     }
 
-    public static void configureDatabase(String[] createStatements) throws DataAccessException {
+    public static void configureDatabase(String[] CREATE_STATEMENTS) throws DataAccessException {
         DatabaseManager.createDatabase();
         try (var conn = DatabaseManager.getConnection()) {
-            for (var statement : createStatements) {
+            for (var statement : CREATE_STATEMENTS) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
                 }

@@ -8,15 +8,16 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 
 
 public class GameDaoSql implements GameDAO {
     public GameDaoSql() throws DataAccessException {
-        configureDatabase(CreateStatements);
+        configureDatabase(CREATE_STATEMENTS);
     }
-    private static final String[] CreateStatements = {
+    private static final String[] CREATE_STATEMENTS = {
             """
     CREATE TABLE IF NOT EXISTS game (
     `id` INT AUTO_INCREMENT NOT NULL,
@@ -137,10 +138,10 @@ public class GameDaoSql implements GameDAO {
         }
     }
 
-    public static void configureDatabase(String[] createStatements) throws DataAccessException {
+    public static void configureDatabase(String[] CREATE_STATEMENTS) throws DataAccessException {
         DatabaseManager.createDatabase();
         try (var conn = DatabaseManager.getConnection()) {
-            for (var statement : createStatements) {
+            for (var statement : CREATE_STATEMENTS) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
                 }
