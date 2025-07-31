@@ -2,18 +2,14 @@ package server;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
-import models.GameData;
 import request.*;
 import result.*;
-
 import java.io.*;
 import java.net.*;
-import java.util.List;
 
 public class ServerFacade {
 
     private final String serverUrl;
-    private List<GameData> cachedGames;
     private String authToken;
 
     public ServerFacade(String url) {
@@ -54,17 +50,6 @@ public class ServerFacade {
         return this.makeRequest("POST",path,request,CreateGameResult.class, this.authToken);
 
     }
-    public GameData getGame(int gameID) throws ResponseException{
-        if (cachedGames!=null){
-        for (GameData game: cachedGames) {
-            if (game.getGameID() == gameID) {
-                return game;
-            }
-        }
-        }
-        throw new ResponseException(400, "GameID not found");
-    }
-
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
@@ -140,12 +125,7 @@ public class ServerFacade {
         return response;
     }
 
-
     private boolean isSuccessful(int status) {
         return status / 100 == 2;
-    }
-
-    public void setCachedGames(List<GameData> cachedGames) {
-        this.cachedGames = cachedGames;
     }
 }
