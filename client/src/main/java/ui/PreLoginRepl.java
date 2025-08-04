@@ -5,7 +5,7 @@ import request.LoginRequest;
 import request.RegisterRequest;
 import server.ServerFacade;
 import ui.websocket.NotificationHandler;
-import websocketmesssages.ServerMessage;
+import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
 import java.util.Scanner;

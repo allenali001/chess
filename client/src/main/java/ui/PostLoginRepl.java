@@ -6,7 +6,7 @@ import request.CreateGameRequest;
 import request.JoinGameRequest;
 import server.ServerFacade;
 import ui.websocket.NotificationHandler;
-import websocketmesssages.ServerMessage;
+import websocket.messages.ServerMessage;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
