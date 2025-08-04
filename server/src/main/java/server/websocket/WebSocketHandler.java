@@ -14,6 +14,7 @@ import websocket.messages.ServerMessage;
 import java.io.IOException;
 import models.AuthData;
 import service.exceptions.*;
+import websocket.commands.UserGameCommand;
 
 @WebSocket
 public class WebSocketHandler {
@@ -31,18 +32,18 @@ public class WebSocketHandler {
     public void onMessage(Session session, String message) throws IOException {
         try {
             UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
-            String username = getUsername(command.authToken());
-            switch (command.type()) {
+            String username = getUsername(command.getAuthToken());
+            switch (command.getCommandType()) {
                 case CONNECT -> connect(username, session);
                 case MAKE_MOVE -> makeMove(command, username, session);
                 case LEAVE -> leaveGame(username);
                 case RESIGN -> resign(username);
             }
         } catch (UnauthorizedException ex) {
-            sendMessage(session, new ServerMessage(ServerMessage.Type.ERROR, "Unauthorized", null));
+            sendMessage(session, new ServerMessage(ServerMessage.ServerMessageType.ERROR));
         }catch (Exception ex){
             ex.printStackTrace();
-            sendMessage(session, new ServerMessage(ServerMessage.Type.ERROR, "Error"+ex.getMessage(),null ));
+            sendMessage(session, new ServerMessage(ServerMessage.ServerMessageType.ERROR));
         }
     }
 
@@ -50,20 +51,20 @@ public class WebSocketHandler {
     private void connect(String username, Session session) throws IOException {
         connections.add(username, session);
         var message = String.format("%s has joined the game", username);
-        var notification = new ServerMessage(ServerMessage.Type.NOTIFICATION, message, null);
+        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
         connections.broadcast(username, notification);
     }
 
     private void leaveGame(String username) throws IOException {
         connections.remove(username);
         var message = String.format("%s has left the game", username);
-        var notification = new ServerMessage(ServerMessage.Type.NOTIFICATION, message, null);
+        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
         connections.broadcast(username, notification);
     }
 
     private void resign(String username) throws IOException {
         var message = String.format("%s has resigned", username);
-        var notification = new ServerMessage(ServerMessage.Type.NOTIFICATION, message, null);
+        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
         connections.broadcast(username, notification);
     }
 
@@ -74,17 +75,16 @@ public class WebSocketHandler {
 
     private void makeMove(UserGameCommand command, String username, Session session) throws IOException {
         try {
-            var move = command.move();
-            ChessGame game = getGame(command.gameID());
+            var move = command.getMove();
+            ChessGame game = getGame(command.getGameID());
             game.makeMove(move);
-            var message = String.format("%s has moved from %s to %s", username, move.getStartPosition(), move.getEndPosition());
-            var notification = new ServerMessage(ServerMessage.Type.LOAD_GAME, message, game);
+            var notification = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
             connections.broadcast(username, notification);
         } catch (InvalidMoveException ex) {
-            var errorMessage = new ServerMessage(ServerMessage.Type.ERROR, "Invalid move", null);
+            var errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
             session.getRemote().sendString(errorMessage.toString());
         } catch (DataAccessException ex) {
-            var errorMessage = new ServerMessage(ServerMessage.Type.ERROR, "Could not access server", null);
+            var errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
             session.getRemote().sendString(errorMessage.toString());
         }
     }
