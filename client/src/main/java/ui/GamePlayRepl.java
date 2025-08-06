@@ -30,6 +30,7 @@ public class GamePlayRepl {
         out.print(RESET_BG_COLOR);
         out.print(RESET_TEXT_COLOR);
         Scanner scanner = new Scanner(System.in);
+        System.out.println("Entered gameplay/observe mode. Type 'help' for options.");
         while (true) {
             printPrompt();
             String input = scanner.nextLine().trim();
@@ -41,7 +42,7 @@ public class GamePlayRepl {
                     case "help" -> System.out.println(help());
                     case "redraw" -> doRedraw();
                     case "leave" -> doLeave();
-                    case "makemove" -> doMakeMove();
+                    case "makeMove" -> doMakeMove();
                     case "resign"-> doResign();
                     case "highlight" -> doHighlight();
                     default -> System.out.print("Command not recognized. " +
@@ -51,6 +52,24 @@ public class GamePlayRepl {
                 System.out.println("Error: " + ex.getMessage());
             }
         }
+    }
+    public String help() {
+
+        return """
+                - redraw - chess board
+                - leave - chess game
+                - makeMove <STARTPOSITION> <ENDPOSITION> - move chess pieces
+                - highlight - possible moves for piece
+                - resign - from game
+                - help - with possible commands
+                """;
+    }
+
+    private void doRedraw(){
+        out.print(ERASE_SCREEN);
+        drawBoard();
+        out.print(RESET_BG_COLOR);
+        out.print(RESET_TEXT_COLOR);
     }
 
     private void drawHeaders() {
@@ -63,7 +82,7 @@ public class GamePlayRepl {
         out.println();
     }
     public void printPrompt(){
-        System.out.print("\n" + "[LOGGED_IN] >>> ");
+        System.out.print("\n" + "[GAMEPLAY] >>> ");
     }
 
 
