@@ -4,9 +4,11 @@ import static ui.EscapeSequences.*;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Scanner;
 
 public class GamePlayRepl {
-
+    private final ChessClient client;
     private final PrintStream out;
     private final int gameID;
     private final String role;
@@ -14,11 +16,12 @@ public class GamePlayRepl {
 
     private static final int BOARD_SIZE_IN_SQUARES = 8;
 
-    public GamePlayRepl(Object client, int gameID, String role){
+    public GamePlayRepl(ChessClient client, int gameID, String role){
         this.out=new PrintStream(System.out, true, StandardCharsets.UTF_8);
         this.gameID=gameID;
         this.role=role;
         this.isBlackPerspective="BLACK".equalsIgnoreCase(role);
+        this.client = client;
     }
 
     public void run() {
@@ -26,6 +29,28 @@ public class GamePlayRepl {
         drawBoard();
         out.print(RESET_BG_COLOR);
         out.print(RESET_TEXT_COLOR);
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            printPrompt();
+            String input = scanner.nextLine().trim();
+            var tokens = input.toLowerCase().split(" ");
+            var cmd = (tokens.length > 0) ? tokens[0] : "help";
+            var params = Arrays.copyOfRange(tokens, 1, tokens.length);
+            try {
+                switch (cmd) {
+                    case "help" -> System.out.println(help());
+                    case "redraw" -> doRedraw();
+                    case "leave" -> doLeave();
+                    case "makemove" -> doMakeMove();
+                    case "resign"-> doResign();
+                    case "highlight" -> doHighlight();
+                    default -> System.out.print("Command not recognized. " +
+                            "Check spelling and try again, or type 'help' for options.");
+                }
+            } catch (Exception ex) {
+                System.out.println("Error: " + ex.getMessage());
+            }
+        }
     }
 
     private void drawHeaders() {
@@ -37,6 +62,10 @@ public class GamePlayRepl {
         }
         out.println();
     }
+    public void printPrompt(){
+        System.out.print("\n" + "[LOGGED_IN] >>> ");
+    }
+
 
     private void drawBoard() {
         drawHeaders();

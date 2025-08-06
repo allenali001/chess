@@ -14,6 +14,9 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import service.exceptions.UnauthorizedException;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 import java.io.IOException;
 
@@ -50,7 +53,7 @@ public class WebSocketHandler {
     private void connect(String username, Session session, int gameID) throws IOException, DataAccessException {
         connections.add(username, session);
         GameData gameData = gameDAO.getGame(gameID);
-        var loadGame = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData.getGame());
+        var loadGame = new LoadGameMessage(gameData.getGame());
         sendMessage(session, loadGame);
         String role;
         if (username.equals(gameData.getBlackUsername())){
@@ -61,7 +64,7 @@ public class WebSocketHandler {
             role = "as an observer";
         }
         var message = String.format("%s has joined the game %s", username, role);
-        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        var notification = new NotificationMessage(message);
         connections.broadcast(username, notification);
     }
 
@@ -80,7 +83,7 @@ public class WebSocketHandler {
             gameDAO.updateGame(gameData);
         }
         var message = String.format("%s has left the game", username);
-        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        var notification = new NotificationMessage(message);
         connections.broadcast(username, notification);
     }
 
@@ -90,7 +93,7 @@ public class WebSocketHandler {
         game.closeGame(true);
         gameDAO.updateGame(gameData);
         var message = String.format("%s has resigned", username);
-        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        var notification = new NotificationMessage(message);
         connections.broadcast(username, notification);
     }
 
@@ -99,40 +102,40 @@ public class WebSocketHandler {
             GameData gameData = gameDAO.getGame(command.getGameID());
             ChessGame game = gameData.getGame();
             if(game.gameIsOver()){
-                var message = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "This game is over and is no longer playable.");
+                var message = new ErrorMessage("This game is over and is no longer playable");
                 session.getRemote().sendString(message.toString());
             return;
             }
             ChessMove move = command.getMove();
             game.makeMove(move);
             gameDAO.updateGame(gameData);
-            var notification = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME,game);
+            var notification = new LoadGameMessage(gameData.getGame());
             connections.broadcast("", notification);
             String message = String.format("%s moved from %s to %s", username, move.getStartPosition(), move.getEndPosition());
-            var notification1 = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+            var notification1 = new NotificationMessage(message);
             connections.broadcast(username,notification1);
             ChessGame.TeamColor opponentColor=game.getTeamTurn();
             String opponent = (opponentColor == ChessGame.TeamColor.WHITE) ? gameData.getWhiteUsername() : gameData.getBlackUsername();
             if (game.isInCheck(opponentColor)){
                 var checkMessage = String.format("%s is in check", opponent);
-                var checkNotif = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, checkMessage);
+                var checkNotif = new NotificationMessage(checkMessage);
                 connections.broadcast("", checkNotif);
             }
             if (game.isInCheckmate(opponentColor)) {
                 var checkmateMessage = String.format("%s is in checkmate", opponent);
-                var checkmateNotif = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, checkmateMessage);
+                var checkmateNotif = new NotificationMessage(checkmateMessage);
                 connections.broadcast("", checkmateNotif);
             }
             if (game.isInStalemate(opponentColor)) {
                 var stalemateMessage = String.format("%s is in stalemate", opponent);
-                var stalemateNotif = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, stalemateMessage);
+                var stalemateNotif = new NotificationMessage(stalemateMessage);
                 connections.broadcast("", stalemateNotif);
             }
         } catch (InvalidMoveException ex) {
-            var errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Invalid move");
+            var errorMessage = new ErrorMessage("Invalid move");
             session.getRemote().sendString(errorMessage.toString());
         } catch (DataAccessException ex) {
-            var errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Could not access server");
+            var errorMessage = new ErrorMessage("Could not access server");
             session.getRemote().sendString(errorMessage.toString());
         }
     }
