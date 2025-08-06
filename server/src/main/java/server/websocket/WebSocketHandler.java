@@ -37,8 +37,8 @@ public class WebSocketHandler {
             switch (command.getCommandType()) {
                 case CONNECT -> connect(username, session, command.getGameID());
                 //case MAKE_MOVE -> makeMove(command, username, session);
-                case LEAVE -> leaveGame(username);
-                case RESIGN -> resign(username);
+                case LEAVE -> leaveGame(username, command.getGameID());
+                case RESIGN -> resign(username, command.getGameID());
             }
         } catch (UnauthorizedException ex) {
             sendMessage(session, new ServerMessage(ServerMessage.ServerMessageType.ERROR, message));
@@ -67,22 +67,29 @@ public class WebSocketHandler {
         connections.broadcast(username, notification);
     }
 
-    private void leaveGame(String username) throws IOException {
+    private void leaveGame(String username, int gameID) throws IOException, DataAccessException {
         connections.remove(username);
+        GameData gameData = gameDAO.getGame(gameID);
+        boolean spaceInGame = false;
+        if (username.equals(gameData.getWhiteUsername())){
+            gameData.setWhiteUsername(null);
+            spaceInGame= true;
+        }else if (username.equals(gameData.getBlackUsername())){
+            gameData.setBlackUsername(null);
+            spaceInGame = true;
+        }
+        if (spaceInGame){
+            gameDAO.updateGame(gameData);
+        }
         var message = String.format("%s has left the game", username);
         var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcast(username, notification);
     }
 
-    private void resign(String username) throws IOException {
+    private void resign(String username, int gameID) throws IOException {
         var message = String.format("%s has resigned", username);
         var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcast(username, notification);
-    }
-
-    private ChessGame getGame(int gameID) throws DataAccessException {
-        GameData gameData = gameDAO.getGame(gameID);
-        return gameData.getGame();
     }
 
  /*   private void makeMove(UserGameCommand command, String username, Session session) throws IOException {
@@ -105,7 +112,10 @@ public class WebSocketHandler {
     private void sendMessage(Session session, ServerMessage message) throws IOException {
         session.getRemote().sendString(message.toString());
     }
-
+    private ChessGame getGame(int gameID) throws DataAccessException {
+        GameData gameData = gameDAO.getGame(gameID);
+        return gameData.getGame();
+    }
     private String getUsername(String authToken) throws UnauthorizedException, DataAccessException {
         AuthData authData = authDAO.getAuth(authToken);
         if (authData == null) {
