@@ -54,7 +54,15 @@ public class WebSocketHandler {
         GameData gameData = gameDAO.getGame(gameID);
         var loadGame = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData.getGame());
         sendMessage(session, loadGame);
-        var message = String.format("%s has joined the game", username);
+        String role;
+        if (username.equals(gameData.getBlackUsername())){
+            role = "as black team";
+        }else if (username.equals(gameData.getWhiteUsername())){
+            role = "as white team";
+        }else{
+            role = "as an observer";
+        }
+        var message = String.format("%s has joined the game %s", username, role);
         var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcast(username, notification);
     }
