@@ -7,7 +7,6 @@ public class MakeMoveCommand extends UserGameCommand{
         super(CommandType.MAKE_MOVE, authToken, gameID, move);
     }
     public ChessMove getMove(){
-        ChessMove move = super.getMove();
-        return move;
+        return super.getMove();
     }
 }
