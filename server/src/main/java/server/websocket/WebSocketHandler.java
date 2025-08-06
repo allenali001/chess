@@ -3,18 +3,20 @@ package server.websocket;
 import chess.ChessGame;
 import chess.InvalidMoveException;
 import com.google.gson.Gson;
+import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
-import dataaccess.AuthDAO;
+import models.AuthData;
 import models.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import service.exceptions.UnauthorizedException;
+import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 import java.io.IOException;
-import models.AuthData;
-import service.exceptions.*;
-import websocket.commands.UserGameCommand;
+import java.util.Timer;
+
 
 @WebSocket
 public class WebSocketHandler {
@@ -40,10 +42,10 @@ public class WebSocketHandler {
                 case RESIGN -> resign(username);
             }
         } catch (UnauthorizedException ex) {
-            sendMessage(session, new ServerMessage(ServerMessage.ServerMessageType.ERROR));
+            sendMessage(session, new ServerMessage(ServerMessage.ServerMessageType.ERROR, "ERROR"));
         }catch (Exception ex){
             ex.printStackTrace();
-            sendMessage(session, new ServerMessage(ServerMessage.ServerMessageType.ERROR));
+            sendMessage(session, new ServerMessage(ServerMessage.ServerMessageType.ERROR, "ERROR"));
         }
     }
 
@@ -51,20 +53,20 @@ public class WebSocketHandler {
     private void connect(String username, Session session) throws IOException {
         connections.add(username, session);
         var message = String.format("%s has joined the game", username);
-        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "ERROR");
         connections.broadcast(username, notification);
     }
 
     private void leaveGame(String username) throws IOException {
         connections.remove(username);
         var message = String.format("%s has left the game", username);
-        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "%s has left the game");
         connections.broadcast(username, notification);
     }
 
     private void resign(String username) throws IOException {
         var message = String.format("%s has resigned", username);
-        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "%s has resigned from the game");
         connections.broadcast(username, notification);
     }
 
@@ -78,13 +80,13 @@ public class WebSocketHandler {
             var move = command.getMove();
             ChessGame game = getGame(command.getGameID());
             game.makeMove(move);
-            var notification = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
+            var notification = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, null);
             connections.broadcast(username, notification);
         } catch (InvalidMoveException ex) {
-            var errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
+            var errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Invalid move");
             session.getRemote().sendString(errorMessage.toString());
         } catch (DataAccessException ex) {
-            var errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
+            var errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Could not access server");
             session.getRemote().sendString(errorMessage.toString());
         }
     }

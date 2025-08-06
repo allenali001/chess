@@ -1,5 +1,7 @@
 package websocket.messages;
 
+import com.google.gson.Gson;
+
 import java.util.Objects;
 
 /**
@@ -10,6 +12,7 @@ import java.util.Objects;
  */
 public class ServerMessage {
     ServerMessageType serverMessageType;
+    String message;
 
     public enum ServerMessageType {
         LOAD_GAME,
@@ -17,14 +20,14 @@ public class ServerMessage {
         NOTIFICATION
     }
 
-    public ServerMessage(ServerMessageType type) {
+    public ServerMessage(ServerMessageType type, String message) {
         this.serverMessageType = type;
+        this.message = message;
     }
-
+    public String getMessage() { return this.message; }
     public ServerMessageType getServerMessageType() {
         return this.serverMessageType;
     }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -36,8 +39,11 @@ public class ServerMessage {
         ServerMessage that = (ServerMessage) o;
         return getServerMessageType() == that.getServerMessageType();
     }
+    public String toString() {
+        return new Gson().toJson(this);
+    }
 
-    @Override
+@Override
     public int hashCode() {
         return Objects.hash(getServerMessageType());
     }

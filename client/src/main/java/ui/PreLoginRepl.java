@@ -86,7 +86,7 @@ public class PreLoginRepl implements NotificationHandler {
 
     @Override
     public void notify (ServerMessage notification){
-        System.out.println(notification.message());
+        System.out.println(notification.getMessage());
         printPrompt();
     }
 }
