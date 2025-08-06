@@ -15,7 +15,6 @@ import service.exceptions.UnauthorizedException;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 import java.io.IOException;
-import java.util.Timer;
 
 
 @WebSocket
@@ -36,37 +35,40 @@ public class WebSocketHandler {
             UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
             String username = getUsername(command.getAuthToken());
             switch (command.getCommandType()) {
-                case CONNECT -> connect(username, session);
-                case MAKE_MOVE -> makeMove(command, username, session);
+                case CONNECT -> connect(username, session, command.getGameID());
+                //case MAKE_MOVE -> makeMove(command, username, session);
                 case LEAVE -> leaveGame(username);
                 case RESIGN -> resign(username);
             }
         } catch (UnauthorizedException ex) {
-            sendMessage(session, new ServerMessage(ServerMessage.ServerMessageType.ERROR, "ERROR"));
+            sendMessage(session, new ServerMessage(ServerMessage.ServerMessageType.ERROR, message));
         }catch (Exception ex){
             ex.printStackTrace();
-            sendMessage(session, new ServerMessage(ServerMessage.ServerMessageType.ERROR, "ERROR"));
+            sendMessage(session, new ServerMessage(ServerMessage.ServerMessageType.ERROR, message));
         }
     }
 
 
-    private void connect(String username, Session session) throws IOException {
+    private void connect(String username, Session session, int gameID) throws IOException, DataAccessException {
         connections.add(username, session);
+        GameData gameData = gameDAO.getGame(gameID);
+        var loadGame = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData.getGame());
+        sendMessage(session, loadGame);
         var message = String.format("%s has joined the game", username);
-        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "ERROR");
+        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcast(username, notification);
     }
 
     private void leaveGame(String username) throws IOException {
         connections.remove(username);
         var message = String.format("%s has left the game", username);
-        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "%s has left the game");
+        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcast(username, notification);
     }
 
     private void resign(String username) throws IOException {
         var message = String.format("%s has resigned", username);
-        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "%s has resigned from the game");
+        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcast(username, notification);
     }
 
@@ -75,12 +77,12 @@ public class WebSocketHandler {
         return gameData.getGame();
     }
 
-    private void makeMove(UserGameCommand command, String username, Session session) throws IOException {
+ /*   private void makeMove(UserGameCommand command, String username, Session session) throws IOException {
         try {
             var move = command.getMove();
             ChessGame game = getGame(command.getGameID());
             game.makeMove(move);
-            var notification = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, null);
+            var notification = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, null );
             connections.broadcast(username, notification);
         } catch (InvalidMoveException ex) {
             var errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Invalid move");
@@ -90,6 +92,7 @@ public class WebSocketHandler {
             session.getRemote().sendString(errorMessage.toString());
         }
     }
+  */
 
     private void sendMessage(Session session, ServerMessage message) throws IOException {
         session.getRemote().sendString(message.toString());
