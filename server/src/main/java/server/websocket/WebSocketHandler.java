@@ -41,11 +41,8 @@ public class WebSocketHandler {
                 case LEAVE -> leaveGame(username, command.getGameID());
                 case RESIGN -> resign(username, command.getGameID());
             }
-        } catch (UnauthorizedException ex) {
-            sendMessage(session, new ServerMessage(ServerMessage.ServerMessageType.ERROR, message));
-        }catch (Exception ex){
-            ex.printStackTrace();
-            sendMessage(session, new ServerMessage(ServerMessage.ServerMessageType.ERROR, message));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 

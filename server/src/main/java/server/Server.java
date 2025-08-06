@@ -35,11 +35,7 @@ public class Server {
             this.clearService = new ClearService(userDAO, authDAO, gameDAO);
             this.webSocketHandler = new WebSocketHandler(gameDAO,authDAO);
         } catch (DataAccessException ex) {
-            try {
-                throw new DataAccessException("Error: could not access server");
-            } catch (DataAccessException e) {
-                throw new RuntimeException(e);
-            }
+            throw new RuntimeException("Error: Could not access server", ex);
         }
     }
 

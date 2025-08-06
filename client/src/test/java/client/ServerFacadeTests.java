@@ -52,9 +52,8 @@ public class ServerFacadeTests {
     public void loginSuccess() throws ResponseException {
         var username = "LoginSuccess" + System.currentTimeMillis();
         facade.register(new RegisterRequest(username, "password", "email"));
-        Assertions.assertThrows(ResponseException.class, () -> {
-            facade.login(new LoginRequest(username, "password"));
-        });
+        var result = facade.login(new LoginRequest(username, "password"));
+        Assertions.assertEquals(username,result.username());
     }
 
     @Test
