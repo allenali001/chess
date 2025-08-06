@@ -252,4 +252,11 @@ public class ChessGame {
     public ChessBoard getBoard() {
         return this.board;
     }
+    private boolean gameOver = false;
+    public boolean gameIsOver(){
+        return gameOver;
+    }
+    public void closeGame(boolean gameOver){
+        this.gameOver=gameOver;
+    }
 }
