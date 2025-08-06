@@ -1,6 +1,7 @@
 package server.websocket;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;
@@ -36,7 +37,7 @@ public class WebSocketHandler {
             String username = getUsername(command.getAuthToken());
             switch (command.getCommandType()) {
                 case CONNECT -> connect(username, session, command.getGameID());
-                //case MAKE_MOVE -> makeMove(command, username, session);
+                case MAKE_MOVE -> makeMove(command, username, session);
                 case LEAVE -> leaveGame(username, command.getGameID());
                 case RESIGN -> resign(username, command.getGameID());
             }
@@ -96,15 +97,40 @@ public class WebSocketHandler {
         connections.broadcast(username, notification);
     }
 
- /*   private void makeMove(UserGameCommand command, String username, Session session) throws IOException {
+    private void makeMove(UserGameCommand command, String username, Session session) throws IOException {
         try {
-            if(game.gameIsOver(){
+            GameData gameData = gameDAO.getGame(command.getGameID());
+            ChessGame game = gameData.getGame();
+            if(game.gameIsOver()){
+                var message = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "This game is over and is no longer playable.");
+                session.getRemote().sendString(message.toString());
+            return;
             }
-            var move = command.getMove();
-            ChessGame game = getGame(command.getGameID());
+            ChessMove move = command.getMove();
             game.makeMove(move);
-            var notification = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, null );
-            connections.broadcast(username, notification);
+            gameDAO.updateGame(gameData);
+            var notification = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME,game);
+            connections.broadcast("", notification);
+            String message = String.format("%s moved from %s to %s", username, move.getStartPosition(), move.getEndPosition());
+            var notification1 = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+            connections.broadcast(username,notification1);
+            ChessGame.TeamColor opponentColor=game.getTeamTurn();
+            String opponent = (opponentColor == ChessGame.TeamColor.WHITE) ? gameData.getWhiteUsername() : gameData.getBlackUsername();
+            if (game.isInCheck(opponentColor)){
+                var checkMessage = String.format("%s is in check", opponent);
+                var checkNotif = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, checkMessage);
+                connections.broadcast("", checkNotif);
+            }
+            if (game.isInCheckmate(opponentColor)) {
+                var checkmateMessage = String.format("%s is in checkmate", opponent);
+                var checkmateNotif = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, checkmateMessage);
+                connections.broadcast("", checkmateNotif);
+            }
+            if (game.isInStalemate(opponentColor)) {
+                var stalemateMessage = String.format("%s is in stalemate", opponent);
+                var stalemateNotif = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, stalemateMessage);
+                connections.broadcast("", stalemateNotif);
+            }
         } catch (InvalidMoveException ex) {
             var errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Invalid move");
             session.getRemote().sendString(errorMessage.toString());
@@ -113,15 +139,11 @@ public class WebSocketHandler {
             session.getRemote().sendString(errorMessage.toString());
         }
     }
-  */
 
     private void sendMessage(Session session, ServerMessage message) throws IOException {
         session.getRemote().sendString(message.toString());
     }
-    private ChessGame getGame(int gameID) throws DataAccessException {
-        GameData gameData = gameDAO.getGame(gameID);
-        return gameData.getGame();
-    }
+
     private String getUsername(String authToken) throws UnauthorizedException, DataAccessException {
         AuthData authData = authDAO.getAuth(authToken);
         if (authData == null) {
