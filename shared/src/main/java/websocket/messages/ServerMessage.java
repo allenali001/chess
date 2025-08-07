@@ -30,7 +30,14 @@ public class ServerMessage {
         this.serverMessageType = type;
         this.game = game;
     }
+    public static ServerMessage error(String message){
+        return new ServerMessage(ServerMessageType.ERROR, message);
+    }
+    public ServerMessage(ServerMessageType type) {
+        this.serverMessageType = type;
+    }
     public String getMessage() { return this.message; }
+
     public ServerMessageType getServerMessageType() {
         return this.serverMessageType;
     }
