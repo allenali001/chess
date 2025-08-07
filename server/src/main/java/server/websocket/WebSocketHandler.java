@@ -46,6 +46,9 @@ public class WebSocketHandler {
             }
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
+        }catch (UnauthorizedException ex){
+            var msg = new ErrorMessage("Error: Unathorized");
+            session.getRemote().sendString(msg.toString());
         }
     }
 
