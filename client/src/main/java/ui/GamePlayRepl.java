@@ -1,8 +1,9 @@
 package ui;
 
-import chess.ChessMove;
-import chess.ChessPosition;
+import chess.*;
+import exception.ResponseException;
 import ui.websocket.WebSocketFacade;
+import websocket.commands.ConnectCommand;
 import websocket.commands.LeaveCommand;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.ResignCommand;
@@ -12,6 +13,8 @@ import static ui.EscapeSequences.*;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Scanner;
 
 public class GamePlayRepl {
@@ -22,6 +25,8 @@ public class GamePlayRepl {
     private final String username;
     private final int gameID;
     private final boolean isBlackPerspective;
+    private ChessPosition highlightedPiece=null;
+    private Collection<ChessMove> highlightedMoves = List.of();
 
     private static final int BOARD_SIZE_IN_SQUARES = 8;
 
@@ -36,6 +41,7 @@ public class GamePlayRepl {
     }
 
     public void run() {
+        ws.send(new ConnectCommand(authToken,gameID));
         out.print(ERASE_SCREEN);
         drawBoard();
         out.print(RESET_BG_COLOR);
@@ -44,8 +50,8 @@ public class GamePlayRepl {
         System.out.println("Entered gameplay/observe mode. Type 'help' for options.");
         while (true) {
             printPrompt();
-            String input = scanner.nextLine().trim();
-            var tokens = input.toLowerCase().split(" ");
+            String line = scanner.nextLine().trim();
+            var tokens = line.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             try {
@@ -60,7 +66,7 @@ public class GamePlayRepl {
                             "Check spelling and try again, or type 'help' for options.");
                 }
             } catch (Exception ex) {
-                System.out.println("Error: " + ex.getMessage());
+                System.out.println(ex.getMessage());
             }
         }
     }
@@ -89,14 +95,14 @@ public class GamePlayRepl {
         }
 
 
-    private void doMakeMove(String[] params){
+    private void doMakeMove(String[] params) throws ResponseException {
         if (params.length >=2){
             ChessPosition startPos = getPosition(params[0]);
             ChessPosition endPos = getPosition(params[1]);
             ChessMove move = new ChessMove(startPos,endPos,null);
             ws.send(new MakeMoveCommand(authToken,gameID,move));
         }else{
-            System.out.println("Must enter starting position and end position \n Example: a2 a3");
+            throw new ResponseException(400, "Must enter starting position and end position \n Example: a2 a3");
         }
     }
     private ChessPosition getPosition(String input){
@@ -109,7 +115,7 @@ public class GamePlayRepl {
         return new ChessPosition(row,col);
     }
 
-    private void doResign(){
+    private void doResign() throws ResponseException {
         System.out.println("Are you sure you want to resign?\n " +
                 "Reply 'Y' for 'Yes', 'N' for 'No'");
         Scanner scanner = new Scanner(System.in);
@@ -121,12 +127,31 @@ public class GamePlayRepl {
             }else if (res.equals("N")) {
             System.out.println("Cancelled resignation request");
         }else{
-            System.out.println("Please enter 'Y' to resign, or 'N' to cancel request");
+            throw new ResponseException(400, "Please enter 'Y' to resign, or 'N' to cancel request");
         }
     }
 
     private void doHighlight(){
-
+        System.out.println("Enter the position of the piece you'd like to view.\n Legal moves will be highlighted");
+        Scanner scanner = new Scanner(System.in);
+        String line = scanner.nextLine().trim();
+        try {
+            ChessPosition chessPosition = getPosition(line);
+            ChessGame game = client.getServer().getGame(gameID);
+            ChessBoard board = game.getBoard();
+            ChessPiece piece = board.getPiece(chessPosition);
+            if (piece == null) {
+                System.out.println("The position you have entered does not have a piece on it.\n Check coordinates and try again.");
+                return;
+            }
+            this.highlightedPiece = chessPosition;
+            this.highlightedMoves = piece.pieceMoves(board,chessPosition);
+            doRedraw();
+        }catch (IllegalArgumentException ex){
+            System.out.println("Input not recognized. Make sure valid coordinate entered.");
+        } catch (ResponseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void drawHeaders() {
@@ -152,7 +177,17 @@ public class GamePlayRepl {
             for (int col = 0; col < BOARD_SIZE_IN_SQUARES; col++) {
                 int boardCol = isBlackPerspective ? (BOARD_SIZE_IN_SQUARES - 1 - col) : col;
                 boolean isLight = (row + col) % 2 == 0;
-                String bgColor = isLight ? SET_BG_COLOR_WHITE: SET_BG_COLOR_BLACK;
+                int actualRow = displayRowLabel;
+                int actualCol = boardCol+1;
+                ChessPosition chessPosition = new ChessPosition(actualRow,actualCol);
+                String bgColor;
+                if(highlightedPiece!=null && highlightedPiece.equals(chessPosition)){
+                    bgColor=SET_BG_COLOR_YELLOW;
+                }else if (highlightedMoves!= null && highlightedMoves.stream().anyMatch(m -> m.getEndPosition().equals(chessPosition))){
+                    bgColor=SET_BG_COLOR_GREEN;
+                }else{
+                    bgColor = isLight ? SET_BG_COLOR_WHITE : SET_BG_COLOR_BLACK;
+                }
                 String piece = INITIAL_BOARD[boardRow][boardCol];
                 String coloredPiece = colorizePiece(row, piece);
                 out.print(bgColor + coloredPiece);
