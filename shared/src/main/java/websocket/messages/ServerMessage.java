@@ -31,7 +31,7 @@ public class ServerMessage {
         this.game = game;
     }
     public static ServerMessage error(String message){
-        return new ServerMessage(ServerMessageType.ERROR, message);
+        return new ErrorMessage(message);
     }
     public ServerMessage(ServerMessageType type) {
         this.serverMessageType = type;
