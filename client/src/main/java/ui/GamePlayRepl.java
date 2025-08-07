@@ -1,5 +1,9 @@
 package ui;
 
+import ui.websocket.WebSocketFacade;
+import websocket.commands.LeaveCommand;
+import websocket.commands.ResignCommand;
+
 import static ui.EscapeSequences.*;
 
 import java.io.PrintStream;
@@ -10,18 +14,24 @@ import java.util.Scanner;
 public class GamePlayRepl {
     private final ChessClient client;
     private final PrintStream out;
+    private final String authToken;
+    private final WebSocketFacade ws;
+    private final String username;
     private final int gameID;
     private final String role;
     private final boolean isBlackPerspective;
 
     private static final int BOARD_SIZE_IN_SQUARES = 8;
 
-    public GamePlayRepl(ChessClient client, int gameID, String role){
+    public GamePlayRepl(ChessClient client, int gameID, String role, String authToken, String username, WebSocketFacade ws){
         this.out=new PrintStream(System.out, true, StandardCharsets.UTF_8);
         this.gameID=gameID;
         this.role=role;
         this.isBlackPerspective="BLACK".equalsIgnoreCase(role);
         this.client = client;
+        this.username=username;
+        this.authToken=authToken;
+        this.ws=ws;
     }
 
     public void run() {
@@ -70,6 +80,35 @@ public class GamePlayRepl {
         drawBoard();
         out.print(RESET_BG_COLOR);
         out.print(RESET_TEXT_COLOR);
+    }
+    private void doLeave(){
+        ws.send(new LeaveCommand(authToken, gameID));
+        System.out.println("You have left the game");
+        client.transitionToPostLogin(authToken,username);
+        }
+
+
+    private void doMakeMove(){
+
+    }
+
+    private void doResign(){
+        System.out.println("Are you sure you want to resign?\n Reply 'Y' for 'Yes', 'N' for 'No'");
+        Scanner scanner = new Scanner(System.in);
+        String input = scanner.nextLine().trim();
+        var res = input.toUpperCase();
+        if (res.equals("Y")){
+            ws.send(new ResignCommand(authToken,gameID));
+            System.out.println("You have successfully resigned from the game");
+            }else if (res.equals("N")) {
+            System.out.println("Cancelled resignation request");
+        }else{
+            System.out.println("Please enter 'Y' to resign, or 'N' to cancel request");
+        }
+    }
+
+    private void doHighlight(){
+
     }
 
     private void drawHeaders() {

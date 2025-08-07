@@ -3,7 +3,6 @@ import com.google.gson.Gson;
 import exception.ResponseException;
 import websocket.messages.ServerMessage;
 import websocket.commands.UserGameCommand;
-
 import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;
@@ -43,5 +42,13 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
+    public void send(UserGameCommand command){
+        String json = new Gson().toJson(command);
+        try{
+            session.getBasicRemote().sendText(json);
+        }catch (IOException ex){
+            throw new RuntimeException("Failed to connect to websocket", ex);
+        }
+    }
 }
 
