@@ -53,7 +53,7 @@ public class GameDaoSql implements GameDAO {
             throw new DataAccessException("Error: can't create game");
         }
         ChessGame initial = new ChessGame();
-        GameData newGame = new GameData(gameID, null, null, gameName, initial);
+        GameData newGame = new GameData(gameID, null,null,gameName,initial);
         String json = new Gson().toJson(newGame);
         String n = "UPDATE game SET json = ? WHERE id = ?";
         executeUpdate(n, json, gameID);
@@ -67,14 +67,7 @@ public class GameDaoSql implements GameDAO {
                 ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        int id=rs.getInt("id");
-                        String name = rs.getString("gameName");
-                        String white = rs.getString("whiteUsername");
-                        String black = rs.getString("blackUsername");
-                        String json = rs.getString("json");
-                        ChessGame game = new Gson().fromJson(json, ChessGame.class);
-                        GameData gameData = new GameData(id,white,black,name, game);
-                        return gameData;
+                        return readGame(rs);
                     }
                 }
             }

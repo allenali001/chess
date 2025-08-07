@@ -13,6 +13,7 @@ public class GameData {
         this.whiteUsername = whiteUsername;
         this.blackUsername = blackUsername;
         this.gameName = gameName;
+        this.game=game;
     }
     public void setGame(ChessGame game) { this.game = game;}
     public Integer getGameID(){
