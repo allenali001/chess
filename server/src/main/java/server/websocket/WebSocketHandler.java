@@ -12,6 +12,7 @@ import models.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import service.exceptions.GameOverException;
 import service.exceptions.UnauthorizedException;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
@@ -47,7 +48,7 @@ public class WebSocketHandler {
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }catch (UnauthorizedException ex){
-            var msg = new ErrorMessage("Error: Unathorized");
+            var msg = new ErrorMessage("Error: Unauthorized");
             session.getRemote().sendString(msg.toString());
         }
     }
@@ -115,49 +116,60 @@ public class WebSocketHandler {
         try {
             GameData gameData = gameDAO.getGame(command.getGameID());
             ChessGame game = gameData.getGame();
-            if(game.gameIsOver()){
+            if (game.gameIsOver()) {
                 var message = new ErrorMessage("This game is over and is no longer playable");
                 session.getRemote().sendString(message.toString());
-            return;
+                return;
             }
             String white = gameData.getWhiteUsername();
             String black = gameData.getBlackUsername();
-            if(!username.equals(white)&& !username.equals(black)){
+            if (!username.equals(white) && !username.equals(black)) {
                 var message = new ErrorMessage("Observers cannot make moves in the game");
                 session.getRemote().sendString(message.toString());
                 return;
             }
             ChessMove move = command.getMove();
-            game.makeMove(move);
-            gameDAO.updateGame(gameData);
-            var notification = new LoadGameMessage(gameData.getGame());
-            connections.broadcast("", notification);
-            String message = String.format("%s moved from %s to %s", username, move.getStartPosition(), move.getEndPosition());
-            var notification1 = new NotificationMessage(message);
-            connections.broadcast(username,notification1);
-            ChessGame.TeamColor opponentColor=game.getTeamTurn();
-            String opponent = (opponentColor == ChessGame.TeamColor.WHITE) ? gameData.getWhiteUsername() : gameData.getBlackUsername();
-            if (game.isInCheck(opponentColor)){
-                var checkMessage = String.format("%s is in check", opponent);
-                var checkNotif = new NotificationMessage(checkMessage);
-                connections.broadcast("", checkNotif);
+            try {
+                game.makeMove(move);
+                gameDAO.updateGame(gameData);
+                var loadMessage = new LoadGameMessage(game);
+                connections.broadcast("", loadMessage);
+                String message = String.format("%s moved from %s to %s", username, move.getStartPosition(), move.getEndPosition());
+                var notification1 = new NotificationMessage(message);
+                connections.broadcast(username, notification1);
+                ChessGame.TeamColor opponentColor = game.getTeamTurn();
+                String opponent = (opponentColor == ChessGame.TeamColor.WHITE) ? gameData.getWhiteUsername() : gameData.getBlackUsername();
+                if (game.isInCheck(opponentColor)) {
+                    game.closeGame(true);
+                    gameDAO.updateGame(gameData);
+                    var checkMessage = String.format("%s is in check", opponent);
+                    var checkNotif = new NotificationMessage(checkMessage);
+                    connections.broadcast("", checkNotif);
+                    return;
+                }
+                if (game.isInCheckmate(opponentColor)) {
+                    var checkmateMessage = String.format("%s is in checkmate", opponent);
+                    var checkmateNotif = new NotificationMessage(checkmateMessage);
+                    connections.broadcast("", checkmateNotif);
+                    return;
+                }
+                if (game.isInStalemate(opponentColor)) {
+                    game.closeGame(true);
+                    gameDAO.updateGame(gameData);
+                    var stalemateMessage = String.format("%s is in stalemate", opponent);
+                    var stalemateNotif = new NotificationMessage(stalemateMessage);
+                    connections.broadcast("", stalemateNotif);
+                }
+            } catch (InvalidMoveException ex) {
+                var errorMessage = new ErrorMessage("Invalid move");
+                session.getRemote().sendString(errorMessage.toString());
+            } catch (DataAccessException ex) {
+                var errorMessage = new ErrorMessage("Could not access server");
+                session.getRemote().sendString(errorMessage.toString());
             }
-            if (game.isInCheckmate(opponentColor)) {
-                var checkmateMessage = String.format("%s is in checkmate", opponent);
-                var checkmateNotif = new NotificationMessage(checkmateMessage);
-                connections.broadcast("", checkmateNotif);
-            }
-            if (game.isInStalemate(opponentColor)) {
-                var stalemateMessage = String.format("%s is in stalemate", opponent);
-                var stalemateNotif = new NotificationMessage(stalemateMessage);
-                connections.broadcast("", stalemateNotif);
-            }
-        } catch (InvalidMoveException ex) {
-            var errorMessage = new ErrorMessage("Invalid move");
-            session.getRemote().sendString(errorMessage.toString());
-        } catch (DataAccessException ex) {
-            var errorMessage = new ErrorMessage("Could not access server");
-            session.getRemote().sendString(errorMessage.toString());
+        }catch (DataAccessException ex){
+            var errorMsg= new ErrorMessage("Could not access server");
+            session.getRemote().sendString(errorMsg.toString());
         }
     }
 
