@@ -105,15 +105,19 @@ public class WebSocketHandler {
     private void resign(String username, int gameID) throws IOException, DataAccessException {
         GameData gameData = gameDAO.getGame(gameID);
         ChessGame game = gameData.getGame();
-        game.closeGame(true);
-        gameDAO.updateGame(gameData);
-        if (!username.equals(gameData.getWhiteUsername()) && !username.equals(gameData.getBlackUsername())){
+        if (!username.equals(gameData.getWhiteUsername()) && !username.equals(gameData.getBlackUsername())) {
             connections.sendError(username, "Observers cannot resign from the game");
             return;
         }
+        if (game.gameIsOver()) {
+            connections.sendError(username, "Game is over already. Cannot resigned from ended game");
+            return;
+        }
+        game.closeGame(true);
+        gameDAO.updateGame(gameData);
         var message = String.format("%s has resigned", username);
         var notification = new NotificationMessage(message);
-        connections.broadcast(username, notification);
+        connections.broadcast("", notification);
     }
 
     private void makeMove(UserGameCommand command, String username) throws IOException {
