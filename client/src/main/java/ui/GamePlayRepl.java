@@ -1,7 +1,10 @@
 package ui;
 
+import chess.ChessMove;
+import chess.ChessPosition;
 import ui.websocket.WebSocketFacade;
 import websocket.commands.LeaveCommand;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.ResignCommand;
 
 import static ui.EscapeSequences.*;
@@ -18,7 +21,6 @@ public class GamePlayRepl {
     private final WebSocketFacade ws;
     private final String username;
     private final int gameID;
-    private final String role;
     private final boolean isBlackPerspective;
 
     private static final int BOARD_SIZE_IN_SQUARES = 8;
@@ -26,7 +28,6 @@ public class GamePlayRepl {
     public GamePlayRepl(ChessClient client, int gameID, String role, String authToken, String username, WebSocketFacade ws){
         this.out=new PrintStream(System.out, true, StandardCharsets.UTF_8);
         this.gameID=gameID;
-        this.role=role;
         this.isBlackPerspective="BLACK".equalsIgnoreCase(role);
         this.client = client;
         this.username=username;
@@ -52,7 +53,7 @@ public class GamePlayRepl {
                     case "help" -> System.out.println(help());
                     case "redraw" -> doRedraw();
                     case "leave" -> doLeave();
-                    case "makeMove" -> doMakeMove();
+                    case "makeMove" -> doMakeMove(params);
                     case "resign"-> doResign();
                     case "highlight" -> doHighlight();
                     default -> System.out.print("Command not recognized. " +
@@ -83,17 +84,34 @@ public class GamePlayRepl {
     }
     private void doLeave(){
         ws.send(new LeaveCommand(authToken, gameID));
-        System.out.println("You have left the game");
+        System.out.println("You have successfully left the game");
         client.transitionToPostLogin(authToken,username);
         }
 
 
-    private void doMakeMove(){
-
+    private void doMakeMove(String[] params){
+        if (params.length >=2){
+            ChessPosition startPos = getPosition(params[0]);
+            ChessPosition endPos = getPosition(params[1]);
+            ChessMove move = new ChessMove(startPos,endPos,null);
+            ws.send(new MakeMoveCommand(authToken,gameID,move));
+        }else{
+            System.out.println("Must enter starting position and end position \n Example: a2 a3");
+        }
+    }
+    private ChessPosition getPosition(String input){
+        input = input.toLowerCase();
+        if(!input.matches("[a-h][1-8]")){
+            throw new IllegalArgumentException("Position entered is invalid. \nTry entering a different position.");
+        }
+        int col = input.charAt(0) - 'a'+1;
+        int row = Character.getNumericValue(input.charAt(1));
+        return new ChessPosition(row,col);
     }
 
     private void doResign(){
-        System.out.println("Are you sure you want to resign?\n Reply 'Y' for 'Yes', 'N' for 'No'");
+        System.out.println("Are you sure you want to resign?\n " +
+                "Reply 'Y' for 'Yes', 'N' for 'No'");
         Scanner scanner = new Scanner(System.in);
         String input = scanner.nextLine().trim();
         var res = input.toUpperCase();

@@ -91,7 +91,7 @@ public class PostLoginRepl implements NotificationHandler {
             String playerColor = color.equals("observe") ? null : color;
             server.joinGame(new JoinGameRequest(authToken, game.getGameID(), playerColor));
             System.out.println("Playing game as " + color + ":" + game.getGameName() + "\n");
-            client.transitionToGameplay(game.getGameID(), color);
+            client.transitionToGameplay(game.getGameID(), color,null,null,null);
         }
     }
     public void doObserveGame(String[] params) throws ResponseException{
@@ -103,7 +103,7 @@ public class PostLoginRepl implements NotificationHandler {
             int gameNumber = Integer.parseInt(params[0]);
             var game = gameMap.get(gameNumber);
             System.out.print("Observing game: "+ game.getGameName() + "\n");
-            client.transitionToGameplay(game.getGameID(),"OBSERVER");
+            client.transitionToGameplay(game.getGameID(),"OBSERVER",null,null,null);
         }else{
             System.out.println("GameNumber required");
         }
