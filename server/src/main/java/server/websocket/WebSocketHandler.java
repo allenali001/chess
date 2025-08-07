@@ -107,6 +107,10 @@ public class WebSocketHandler {
         ChessGame game = gameData.getGame();
         game.closeGame(true);
         gameDAO.updateGame(gameData);
+        if (!username.equals(gameData.getWhiteUsername()) && !username.equals(gameData.getBlackUsername())){
+            connections.sendError(username, "Observers cannot resign from the game");
+            return;
+        }
         var message = String.format("%s has resigned", username);
         var notification = new NotificationMessage(message);
         connections.broadcast(username, notification);
