@@ -1,5 +1,6 @@
 package server;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import request.*;
@@ -50,6 +51,12 @@ public class ServerFacade {
         return this.makeRequest("POST",path,request,CreateGameResult.class, this.authToken);
 
     }
+    public ChessGame getGame(int gameID) throws ResponseException {
+        var path = "/game/" + gameID;
+        GameResult gameResult = this.makeRequest("GET", path, null, GameResult.class, this.authToken);
+        return gameResult.getGame();
+    }
+
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
