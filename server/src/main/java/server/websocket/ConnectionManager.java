@@ -36,4 +36,15 @@ public class ConnectionManager {
             connections.remove(c.playerUsername);
         }
     }
+    public void sendError(String username, String errorMessage){
+        ServerMessage error = ServerMessage.error(errorMessage);
+        var connection = connections.get(username);
+        if(connection!=null&&connection.session.isOpen()){
+            try{
+                connection.send(error.toString());
+            }catch(IOException ex){
+                ex.printStackTrace();
+            }
+        }
+    }
 }

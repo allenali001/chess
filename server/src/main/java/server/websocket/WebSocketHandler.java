@@ -52,8 +52,19 @@ public class WebSocketHandler {
 
     private void connect(String username, Session session, int gameID) throws IOException, DataAccessException {
         connections.add(username, session);
-        GameData gameData = gameDAO.getGame(gameID);
-        var loadGame = new LoadGameMessage(gameData.getGame());
+        GameData gameData;
+        try {
+            gameData = gameDAO.getGame(gameID);
+        }catch(DataAccessException ex){
+            connections.sendError(username,"Could not connect to database");
+            return;
+        }
+        if (gameData == null){
+            connections.sendError(username,"No game data");
+            return;
+        }
+        ChessGame game = gameData.getGame();
+        var loadGame = new LoadGameMessage(game);
         sendMessage(session, loadGame);
         String role;
         if (username.equals(gameData.getBlackUsername())){
@@ -105,6 +116,13 @@ public class WebSocketHandler {
                 var message = new ErrorMessage("This game is over and is no longer playable");
                 session.getRemote().sendString(message.toString());
             return;
+            }
+            String white = gameData.getWhiteUsername();
+            String black = gameData.getBlackUsername();
+            if(!username.equals(white)&& !username.equals(black)){
+                var message = new ErrorMessage("Observers cannot make moves in the game");
+                session.getRemote().sendString(message.toString());
+                return;
             }
             ChessMove move = command.getMove();
             game.makeMove(move);
