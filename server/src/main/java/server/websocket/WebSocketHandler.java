@@ -41,7 +41,7 @@ public class WebSocketHandler {
             String username = getUsername(command.getAuthToken());
             switch (command.getCommandType()) {
                 case CONNECT -> connect(username, session, command.getGameID());
-                case MAKE_MOVE -> makeMove(command, username, session);
+                case MAKE_MOVE -> makeMove(command, username);
                 case LEAVE -> leaveGame(username, command.getGameID());
                 case RESIGN -> resign(username, command.getGameID());
             }
@@ -112,45 +112,53 @@ public class WebSocketHandler {
         connections.broadcast(username, notification);
     }
 
-    private void makeMove(UserGameCommand command, String username, Session session) throws IOException {
+    private void makeMove(UserGameCommand command, String username) throws IOException {
         try {
             GameData gameData = gameDAO.getGame(command.getGameID());
             ChessGame game = gameData.getGame();
             if (game.gameIsOver()) {
-                var message = new ErrorMessage("This game is over and is no longer playable");
-                session.getRemote().sendString(message.toString());
+                connections.sendError(username, "This game is over and can no longer be played");
                 return;
             }
             String white = gameData.getWhiteUsername();
             String black = gameData.getBlackUsername();
             if (!username.equals(white) && !username.equals(black)) {
-                var message = new ErrorMessage("Observers cannot make moves in the game");
-                session.getRemote().sendString(message.toString());
+                connections.sendError(username, "Observers cannot make moves in the game");
                 return;
             }
             ChessMove move = command.getMove();
+            ChessGame.TeamColor player = username.equals(white) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+            if (game.getTeamTurn()!=player){
+                connections.sendError(username, "It is not your turn");
+                return;
+            }
             try {
                 game.makeMove(move);
                 gameDAO.updateGame(gameData);
+
                 var loadMessage = new LoadGameMessage(game);
                 connections.broadcast("", loadMessage);
+
                 String message = String.format("%s moved from %s to %s", username, move.getStartPosition(), move.getEndPosition());
                 var notification1 = new NotificationMessage(message);
                 connections.broadcast(username, notification1);
+
                 ChessGame.TeamColor opponentColor = game.getTeamTurn();
                 String opponent = (opponentColor == ChessGame.TeamColor.WHITE) ? gameData.getWhiteUsername() : gameData.getBlackUsername();
+                if (game.isInCheckmate(opponentColor)) {
+                    game.closeGame(true);
+                    gameDAO.updateGame(gameData);
+                    var checkmateMessage = String.format("%s is in checkmate", opponent);
+                    var checkmateNotif = new NotificationMessage(checkmateMessage);
+                    connections.broadcast("", checkmateNotif);
+                    return;
+                }
                 if (game.isInCheck(opponentColor)) {
                     game.closeGame(true);
                     gameDAO.updateGame(gameData);
                     var checkMessage = String.format("%s is in check", opponent);
                     var checkNotif = new NotificationMessage(checkMessage);
                     connections.broadcast("", checkNotif);
-                    return;
-                }
-                if (game.isInCheckmate(opponentColor)) {
-                    var checkmateMessage = String.format("%s is in checkmate", opponent);
-                    var checkmateNotif = new NotificationMessage(checkmateMessage);
-                    connections.broadcast("", checkmateNotif);
                     return;
                 }
                 if (game.isInStalemate(opponentColor)) {
@@ -161,15 +169,10 @@ public class WebSocketHandler {
                     connections.broadcast("", stalemateNotif);
                 }
             } catch (InvalidMoveException ex) {
-                var errorMessage = new ErrorMessage("Invalid move");
-                session.getRemote().sendString(errorMessage.toString());
-            } catch (DataAccessException ex) {
-                var errorMessage = new ErrorMessage("Could not access server");
-                session.getRemote().sendString(errorMessage.toString());
+                connections.sendError(username, "Invalid move");
             }
-        }catch (DataAccessException ex){
-            var errorMsg= new ErrorMessage("Could not access server");
-            session.getRemote().sendString(errorMsg.toString());
+        } catch (DataAccessException ex) {
+            connections.sendError(username, "Could not connect to server");
         }
     }
 
