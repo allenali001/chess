@@ -5,42 +5,39 @@ import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
-    public final ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
+    public final Map<Integer, Map<String,Connection>> trackGameConnections = new ConcurrentHashMap<>();
 
-    public void add(String playerUsername, Session session) {
-        var connection = new Connection(playerUsername, session);
-        connections.put(playerUsername, connection);
+    public void add(String playerUsername, int gameID, Session session) {
+        trackGameConnections.putIfAbsent(gameID,new ConcurrentHashMap<>());
+        trackGameConnections.get(gameID).put(playerUsername, new Connection(playerUsername,session));
     }
 
-    public void remove(String playerUsername) {
+    public void remove(String playerUsername, int gameID) {
+        var connections = trackGameConnections.get(gameID);
         connections.remove(playerUsername);
     }
 
-    public void broadcast(String excludeUsername, ServerMessage notification) throws IOException {
-        var removeList = new ArrayList<Connection>();
+    public void broadcast(String excludeUsername, int gameID, ServerMessage notification) throws IOException {
+        var connections = trackGameConnections.get(gameID);
         for (var c : connections.values()) {
             if (c.session.isOpen()) {
                 if (!c.playerUsername.equals(excludeUsername)) {
                     c.send(notification.toString());
                 }
-            } else {
-                removeList.add(c);
             }
         }
-
-        // Clean up any connections that were left open.
-        for (var c : removeList) {
-            connections.remove(c.playerUsername);
-        }
     }
-    public void sendError(String username, String errorMessage){
-        ServerMessage error = ServerMessage.error(errorMessage);
-        var connection = connections.get(username);
+    public void sendError(String username, int gameID, String errorMessage){
+        var game = trackGameConnections.get(gameID);
+        if (game == null) return;
+        var connection = game.get(username);
         if(connection!=null&&connection.session.isOpen()){
             try{
+                ServerMessage error = ServerMessage.error(errorMessage);
                 connection.send(error.toString());
             }catch(IOException ex){
                 ex.printStackTrace();
