@@ -6,6 +6,7 @@ import request.CreateGameRequest;
 import request.JoinGameRequest;
 import server.ServerFacade;
 import ui.websocket.NotificationHandler;
+import ui.websocket.WebSocketFacade;
 import websocket.messages.ServerMessage;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -16,6 +17,8 @@ public class PostLoginRepl implements NotificationHandler {
     private final ChessClient client;
     private final ServerFacade server;
     private final String authToken;
+    private final String username;
+    private final String serverUrl;
 
     private final Map<Integer, GameData> gameMap = new HashMap<>();
 
@@ -23,6 +26,8 @@ public class PostLoginRepl implements NotificationHandler {
         this.client = client;
         this.server = server;
         this.authToken = authToken;
+        this.username=username;
+        this.serverUrl = client.getServerUrl();
     }
 
     public void run() {
@@ -91,7 +96,8 @@ public class PostLoginRepl implements NotificationHandler {
             String playerColor = color.equals("observe") ? null : color;
             server.joinGame(new JoinGameRequest(authToken, game.getGameID(), playerColor));
             System.out.println("Playing game as " + color + ":" + game.getGameName() + "\n");
-            client.transitionToGameplay(game.getGameID(), color,null,null,null);
+            var ws = new WebSocketFacade(serverUrl,this);
+            client.transitionToGameplay(game.getGameID(), color,authToken,username,ws);
         }
     }
     public void doObserveGame(String[] params) throws ResponseException{
@@ -103,7 +109,8 @@ public class PostLoginRepl implements NotificationHandler {
             int gameNumber = Integer.parseInt(params[0]);
             var game = gameMap.get(gameNumber);
             System.out.print("Observing game: "+ game.getGameName() + "\n");
-            client.transitionToGameplay(game.getGameID(),"OBSERVER",null,null,null);
+            var ws = new WebSocketFacade(serverUrl,this);
+            client.transitionToGameplay(game.getGameID(),"OBSERVER",authToken,username,ws);
         }else{
             System.out.println("GameNumber required");
         }

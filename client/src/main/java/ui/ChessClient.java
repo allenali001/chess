@@ -23,4 +23,7 @@ public class ChessClient {
     public ServerFacade getServer(){
         return server;
     }
+    public String getServerUrl(){
+        return server.getServerUrl();
+    }
 }

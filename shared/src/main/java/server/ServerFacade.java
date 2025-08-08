@@ -7,6 +7,7 @@ import request.*;
 import result.*;
 import java.io.*;
 import java.net.*;
+import java.util.HashMap;
 
 public class ServerFacade {
 
@@ -17,6 +18,9 @@ public class ServerFacade {
         serverUrl = url;
     }
 
+    public String getServerUrl() {
+        return serverUrl;
+    }
     public RegisterResult register(RegisterRequest request) throws ResponseException {
         var path = "/user";
         RegisterResult result = this.makeRequest("POST", path, request, RegisterResult.class);
@@ -116,6 +120,22 @@ public class ServerFacade {
             }
 
             throw new ResponseException(status, "other failure: " + status);
+        }
+    }
+    public static ResponseException fromJson(InputStream input){
+        try {
+            var map = new Gson().fromJson(new InputStreamReader(input), HashMap.class);
+            Object stat = map.get("status");
+            int status = (stat instanceof Double i) ? i.intValue() : 400;
+            String msg = map.getOrDefault("message", "Error").toString();
+            return new ResponseException(status, msg);
+        }catch(Exception ex){
+            try {
+                String msg = new String(input.readAllBytes());
+                return new ResponseException(400, "Malformed Error: " + msg);
+            }catch(Exception ioEx){
+                return new ResponseException(400, "Failed to read body");
+            }
         }
     }
 

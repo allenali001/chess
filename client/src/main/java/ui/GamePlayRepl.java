@@ -59,7 +59,7 @@ public class GamePlayRepl {
                     case "help" -> System.out.println(help());
                     case "redraw" -> doRedraw();
                     case "leave" -> doLeave();
-                    case "makeMove" -> doMakeMove(params);
+                    case "makemove" -> doMakeMove(params);
                     case "resign"-> doResign();
                     case "highlight" -> doHighlight();
                     default -> System.out.print("Command not recognized. " +
@@ -75,24 +75,28 @@ public class GamePlayRepl {
         return """
                 - redraw - chess board
                 - leave - chess game
-                - makeMove <STARTPOSITION> <ENDPOSITION> - move chess pieces
+                - makemove <STARTPOSITION> <ENDPOSITION> - move chess pieces
                 - highlight - possible moves for piece
                 - resign - from game
                 - help - with possible commands
                 """;
     }
 
-    private void doRedraw(){
+    private void doRedraw() {
         out.print(ERASE_SCREEN);
         drawBoard();
         out.print(RESET_BG_COLOR);
         out.print(RESET_TEXT_COLOR);
     }
     private void doLeave(){
-        ws.send(new LeaveCommand(authToken, gameID));
-        System.out.println("You have successfully left the game");
-        client.transitionToPostLogin(authToken,username);
+        try {
+            ws.send(new LeaveCommand(authToken, gameID));
+            System.out.println("You have successfully left the game");
+        } catch (Exception ex) {
+            System.out.println("Error while leaving game" + ex.getMessage());
         }
+        client.transitionToPostLogin(authToken, username);
+    }
 
 
     private void doMakeMove(String[] params) throws ResponseException {
