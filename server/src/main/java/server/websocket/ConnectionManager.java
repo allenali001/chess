@@ -33,7 +33,9 @@ public class ConnectionManager {
     }
     public void sendError(String username, int gameID, String errorMessage){
         var game = trackGameConnections.get(gameID);
-        if (game == null) return;
+        if (game == null) {
+            return;
+        }
         var connection = game.get(username);
         if(connection!=null&&connection.session.isOpen()){
             try{
