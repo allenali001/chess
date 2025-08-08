@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.GameDAO;
 import dataaccess.DataAccessException;
 import models.AuthData;
@@ -23,6 +24,20 @@ public class GameService {
         this.gameDAO = gameDao;
         this.authService = authService;
     }
+    public ChessGame getGame(String authToken, int gameID)
+        throws IncorrectAuthTokenException,NoGameException,DataAccessException{
+            authService.valAuthToken(authToken);
+            GameData gameData=gameDAO.getGame(gameID);
+            if(gameData==null){
+                throw new NoGameException("Error: "+gameID+"not found");
+            }
+            ChessGame game = gameData.getGame();
+            if(game==null){
+                throw new NoGameException("No game with this ID");
+            }
+            return game;
+        }
+
     public CreateGameResult createGame(String authToken, CreateGameRequest request)
             throws IncorrectAuthTokenException, DataAccessException,
             MissingParameterException {

@@ -14,7 +14,7 @@ public class Server {
     private final UserService userService;
     private final GameService gameService;
     private final ClearService clearService;
-    private WebSocketHandler webSocketHandler;
+    private final WebSocketHandler webSocketHandler;
 
 
 
@@ -29,7 +29,6 @@ public class Server {
             var userDAO = new UserDaoSql();
             var authDAO = new AuthDaoSql();
             var gameDAO = new GameDaoSql();
-
             this.userService = new UserService(userDAO, authDAO);
             this.gameService = new GameService(gameDAO, new AuthService(authDAO));
             this.clearService = new ClearService(userDAO, authDAO, gameDAO);
@@ -44,6 +43,7 @@ public class Server {
 
         Spark.staticFiles.location("web");
         Spark.webSocket("/ws", webSocketHandler);
+        Spark.get("/game/:id", new GetGameHandler(gameService));
         Spark.post("/user",new RegisterHandler(userService));
         Spark.post("/session", new LoginHandler(userService));
         Spark.delete("/session", new LogOutHandler(userService));
